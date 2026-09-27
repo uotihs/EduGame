@@ -1,0 +1,42 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class SaveManager
+{
+  private String filePath = dataPath("Data.json");
+  Gson gson = new GsonBuilder().setPrettyPrinting().create(); 
+  
+  public void InitializeData()
+  {
+    SaveIntoData(new MapData()); 
+  }
+  
+  public MapData LoadFromData()
+  {  
+    try (FileReader reader = new FileReader(filePath))
+    {
+      MapData newMapData = gson.fromJson(reader, MapData.class);
+      return newMapData;
+    }
+    catch (IOException e)
+    {
+      System.out.println("File path doesn't exist.");
+      return null;
+    }
+  }
+  
+  public void SaveIntoData(MapData mapData)
+  {
+    try (FileWriter writer = new FileWriter(filePath))
+    { 
+      gson.toJson(mapData, writer);
+    }
+    catch (IOException e)
+    {
+      System.out.println("File path doesn't exist.");
+    }
+  }
+}
