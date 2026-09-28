@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class SaveManager
 {
-  private String filePath = dataPath("Data.json");
+  private String filePath = dataPath("mapdata/Data.json");
   Gson gson = new GsonBuilder().setPrettyPrinting().create(); 
   
   public void InitializeData()
