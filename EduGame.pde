@@ -3,7 +3,11 @@ MapData mapData;
 int[][] roomDisData;
 MobData[][][] mobData;
 ObstacleData[][][] obsData;
-int currentRow, currentColumn;
+
+int currentRow = 2, currentColumn = 2;
+
+PImage backgroundImage;
+PImage[] tiles = new PImage[11];
 
 void setup()
 {
@@ -17,19 +21,11 @@ void setup()
   obsData = mapData.obsData;
   saver.SaveIntoData(mapData);
   
-  currentRow=2;
-  currentColumn=2;
+  InitializeImages();
   
-  for(int i=0; i < roomDisData.length; i++)
-  {
-    for(int j=0; j < roomDisData[i].length; j++)
-    {
-      System.out.print(roomDisData[i][j]+" ");
-    }
-    System.out.print("\n");
-  }
+  tmpPrintRoomDisData();
   
-  size(800, 600);
+  size(880, 720);
   
   //mobData[2][1] = AppendTo(mobData[2][1], new MobData(5, 6));
   //obsData[0][0] = AppendTo(obsData[0][0], new ObstacleData(4, 6, 456));
@@ -38,14 +34,14 @@ void setup()
 
 void draw()
 {
-  background(#000000);
+  RenderBackground();
   tmpDisplayRoomInformation();
 }
 
 void keyPressed()
 {
-  if(keyCode == 65) { enterLeftPortal(); }
-  if(keyCode == 68) { enterRightPortal(); }
-  if(keyCode == 87) { enterTopPortal(); }
-  if(keyCode == 83) { enterBottomPortal(); }
+  if((keyCode == 87) || (keyCode == 38)) { enterTopPortal(); }
+  if((keyCode == 83) || (keyCode == 40)) { enterBottomPortal(); }  
+  if((keyCode == 65) || (keyCode == 37)) { enterLeftPortal(); }
+  if((keyCode == 68) || (keyCode == 39)) { enterRightPortal(); }
 }

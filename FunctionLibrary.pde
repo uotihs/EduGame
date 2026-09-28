@@ -8,6 +8,30 @@ public static <T> T[] AppendTo(T[] oldArr, T item)
   return newArr;
 }
 
+public void InitializeImages()
+{
+  backgroundImage = loadImage("images/background.png");
+  
+  PImage spritesheet = loadImage("images/spritesheet.png");
+  int tileSize = 128;
+  for(int i=0; i < tiles.length; i++)
+  {
+    tiles[i] = spritesheet.get(tileSize * i, 0, tileSize, tileSize); 
+  }
+}
+
+public void tmpPrintRoomDisData()
+{
+  for(int i=0; i < roomDisData.length; i++)
+  {
+    for(int j=0; j < roomDisData[i].length; j++)
+    {
+      System.out.print(roomDisData[i][j]+" ");
+    }
+    System.out.print("\n");
+  }
+}
+
 public void tmpDisplayRoomInformation()
 {
   fill(#FFFFFF);
@@ -30,6 +54,64 @@ public void tmpDisplayRoomInformation()
         ": LocX: "+ thisObs.x +
         ", LocY: "+ thisObs.y +
         ", Type: "+ thisObs.type, 430, 150+i*25); 
+  }
+}
+
+public void RenderBackground()
+{
+  image(backgroundImage, 0, 0, width, height);
+  
+  boolean topRoomExist = true, bottomRoomExist = true, 
+          leftRoomExist = true, rightRoomExist = true;
+  try { if(roomDisData[currentRow - 1][currentColumn] == -1) { topRoomExist = false; } }
+  catch(IndexOutOfBoundsException e) { topRoomExist = false; }
+  try { if(roomDisData[currentRow + 1][currentColumn] == -1) { bottomRoomExist = false; } }
+  catch(IndexOutOfBoundsException e) { bottomRoomExist = false; }
+  try { if(roomDisData[currentRow][currentColumn - 1] == -1) { leftRoomExist = false; } }
+  catch(IndexOutOfBoundsException e) { leftRoomExist = false; }
+  try { if(roomDisData[currentRow][currentColumn + 1] == -1) { rightRoomExist = false; } }
+  catch(IndexOutOfBoundsException e) { rightRoomExist = false; }
+  
+  int gridSize = width / 11;
+  if(topRoomExist) { image(tiles[0], gridSize * 5, 0, gridSize, gridSize); }
+  if(bottomRoomExist) { image(tiles[2], gridSize * 5, height - gridSize, gridSize, gridSize); }
+  if(leftRoomExist) { image(tiles[4], 0, gridSize * 4, gridSize, gridSize); }
+  if(rightRoomExist) { image(tiles[6], width - gridSize, gridSize * 4, gridSize, gridSize); }
+}
+
+public void enterTopPortal()
+{
+  fill(#FFFFFF);
+  textSize(50);
+  try
+  {
+    if(roomDisData[currentRow - 1][currentColumn] == -1)
+    { 
+      text("Top room doesn't exist.", 120, 400); 
+    }
+    else { currentRow -= 1; }
+  }
+  catch(IndexOutOfBoundsException e)
+  {
+    text("Top room doesn't exist.", 120, 400);
+  }
+}
+
+public void enterBottomPortal()
+{
+  fill(#FFFFFF);
+  textSize(50);
+  try
+  {
+    if(roomDisData[currentRow + 1][currentColumn] == -1) 
+    { 
+      text("Bottom room doesn't exist.", 120, 400); 
+    }
+    else { currentRow += 1; }
+  }
+  catch(IndexOutOfBoundsException e)
+  {
+    text("Bottom room doesn't exist.", 120, 400);
   }
 }
 
@@ -66,41 +148,5 @@ public void enterRightPortal()
   catch(IndexOutOfBoundsException e)
   {
     text("Right room doesn't exist.", 120, 400);
-  }
-}
-
-public void enterTopPortal()
-{
-  fill(#FFFFFF);
-  textSize(50);
-  try
-  {
-    if(roomDisData[currentRow - 1][currentColumn] == -1)
-    { 
-      text("Top room doesn't exist.", 120, 400); 
-    }
-    else { currentRow -= 1; }
-  }
-  catch(IndexOutOfBoundsException e)
-  {
-    text("Top room doesn't exist.", 120, 400);
-  }
-}
-
-public void enterBottomPortal()
-{
-  fill(#FFFFFF);
-  textSize(50);
-  try
-  {
-    if(roomDisData[currentRow + 1][currentColumn] == -1) 
-    { 
-      text("Bottom room doesn't exist.", 120, 400); 
-    }
-    else { currentRow += 1; }
-  }
-  catch(IndexOutOfBoundsException e)
-  {
-    text("Bottom room doesn't exist.", 120, 400);
   }
 }
