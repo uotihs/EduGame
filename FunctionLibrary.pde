@@ -79,7 +79,21 @@ public void RenderBackground()
   if(rightRoomExist) { image(tiles[6], width - gridSize, gridSize * 4, gridSize, gridSize); }
 }
 
-public void enterTopPortal()
+public void RenderObstacle()
+{
+  ObstacleData[] thisObsArray = obsData[currentRow][currentColumn];
+  
+  int gridSize = width / 11;
+  for(int i=0; i < thisObsArray.length; i++)
+  {
+    int thisX = thisObsArray[i].getX();
+    int thisY = thisObsArray[i].getY();
+    int thisType = thisObsArray[i].getType() + 8;
+    image(tiles[thisType], gridSize * thisX, gridSize * thisY, gridSize, gridSize);
+  }
+}
+
+public void EnterTopPortal()
 {
   fill(#FFFFFF);
   textSize(50);
@@ -97,7 +111,7 @@ public void enterTopPortal()
   }
 }
 
-public void enterBottomPortal()
+public void EnterBottomPortal()
 {
   fill(#FFFFFF);
   textSize(50);
@@ -115,7 +129,7 @@ public void enterBottomPortal()
   }
 }
 
-public void enterLeftPortal()
+public void EnterLeftPortal()
 {
   fill(#FFFFFF);
   textSize(50);
@@ -133,7 +147,7 @@ public void enterLeftPortal()
   }
 }
 
-public void enterRightPortal()
+public void EnterRightPortal()
 {
   fill(#FFFFFF);
   textSize(50);

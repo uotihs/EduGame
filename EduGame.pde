@@ -28,20 +28,21 @@ void setup()
   size(880, 720);
   
   //mobData[2][1] = AppendTo(mobData[2][1], new MobData(5, 6));
-  //obsData[0][0] = AppendTo(obsData[0][0], new ObstacleData(4, 6, 456));
+  //obsData[2][2] = AppendTo(obsData[2][2], new ObstacleData(2, 3, 1));
   //saver.SaveIntoData(mapData);
 }
 
 void draw()
 {
   RenderBackground();
+  RenderObstacle();
   tmpDisplayRoomInformation();
 }
 
 void keyPressed()
 {
-  if((keyCode == 87) || (keyCode == 38)) { enterTopPortal(); }
-  if((keyCode == 83) || (keyCode == 40)) { enterBottomPortal(); }  
-  if((keyCode == 65) || (keyCode == 37)) { enterLeftPortal(); }
-  if((keyCode == 68) || (keyCode == 39)) { enterRightPortal(); }
+  if((keyCode == 87) || (keyCode == 38)) { EnterTopPortal(); }
+  if((keyCode == 83) || (keyCode == 40)) { EnterBottomPortal(); }  
+  if((keyCode == 65) || (keyCode == 37)) { EnterLeftPortal(); }
+  if((keyCode == 68) || (keyCode == 39)) { EnterRightPortal(); }
 }
