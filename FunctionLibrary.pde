@@ -1,8 +1,6 @@
 import java.util.Arrays;
 import java.lang.IndexOutOfBoundsException;
 
-public float gridSize = 80;
-
 public static <T> T[] appendTo(T[] oldArr, T item)
 {
   T[] newArr = Arrays.copyOf(oldArr, oldArr.length + 1);
