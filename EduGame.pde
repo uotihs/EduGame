@@ -33,7 +33,7 @@ void setup()
   player = new Player();
   //mobData[2][1] = appendTo(mobData[2][1], new MobData(5, 6));
   //obsData[2][2] = appendTo(obsData[2][2], new ObstacleData(2, 3, 1));
-  //saver.SaveIntoData(mapData);
+  //saver.saveIntoData(mapData);
 }
 
 void draw()

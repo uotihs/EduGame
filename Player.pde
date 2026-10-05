@@ -16,26 +16,52 @@ public class Player
   public void moveUp()
   { 
     float nextPlayerY = playerY - speed;
-    if(nextPlayerY < gridSize) { this.playerY = gridSize; }
+    if(isTouchingPoint(width / 2, gridSize * 1.5))
+    { 
+      enterTopPortal();
+      this.playerY = height - gridSize * 2;
+    }
+    else if(nextPlayerY < gridSize) { this.playerY = gridSize; }
     else { this.playerY = nextPlayerY; }
   }
   public void moveDown() 
   { 
     float nextPlayerY = playerY + speed;
-    if(nextPlayerY > height - gridSize - playerSize) { this.playerY = height - gridSize - playerSize; }
+    if(isTouchingPoint(width / 2, height - gridSize * 1.5))
+    {
+      enterBottomPortal();
+      this.playerY = gridSize * 1;
+    }
+    else if(nextPlayerY > height - gridSize - playerSize) { this.playerY = height - gridSize - playerSize; }
     else { this.playerY = nextPlayerY; }
   }
   public void moveLeft() 
   { 
     float nextPlayerX = playerX - speed;
-    if(nextPlayerX < gridSize) { this.playerX = gridSize; }
+    if(isTouchingPoint(gridSize * 1.5, height / 2))
+    {
+      enterLeftPortal();
+      this.playerX = width - gridSize * 2;
+    }
+    else if(nextPlayerX < gridSize) { this.playerX = gridSize; }
     else { this.playerX = nextPlayerX; }
   }
   public void moveRight() 
   { 
     float nextPlayerX = playerX + speed;
-    if(nextPlayerX > width - gridSize - playerSize) { this.playerX = width - gridSize - playerSize; }
+    if(isTouchingPoint(width - gridSize * 1.5, height / 2))
+    {
+      enterRightPortal();
+      this.playerX = gridSize * 1; 
+    }
+    else if(nextPlayerX > width - gridSize - playerSize) { this.playerX = width - gridSize - playerSize; }
     else { this.playerX = nextPlayerX; } 
+  }
+  
+  private boolean isTouchingPoint(float pointX, float pointY)
+  {
+    return ((playerX < pointX) && (playerX + gridSize > pointX)
+          && (playerY < pointY) && (playerY + gridSize > pointY));
   }
   
   public void renderPlayer()
