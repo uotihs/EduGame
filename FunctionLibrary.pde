@@ -1,14 +1,16 @@
 import java.util.Arrays;
 import java.lang.IndexOutOfBoundsException;
 
-public static <T> T[] AppendTo(T[] oldArr, T item)
+public float gridSize = 80;
+
+public static <T> T[] appendTo(T[] oldArr, T item)
 {
   T[] newArr = Arrays.copyOf(oldArr, oldArr.length + 1);
   newArr[newArr.length-1] = item;
   return newArr;
 }
 
-public void InitializeImages()
+public void initializeImages()
 {
   backgroundImage = loadImage("images/background.png");
   
@@ -57,7 +59,7 @@ public void tmpDisplayRoomInformation()
   }
 }
 
-public void RenderBackground()
+public void renderBackground()
 {
   image(backgroundImage, 0, 0, width, height);
   
@@ -79,11 +81,10 @@ public void RenderBackground()
   if(rightRoomExist) { image(tiles[6], width - gridSize, gridSize * 4, gridSize, gridSize); }
 }
 
-public void RenderObstacle()
+public void renderObstacle()
 {
   ObstacleData[] thisObsArray = obsData[currentRow][currentColumn];
   
-  int gridSize = width / 11;
   for(int i=0; i < thisObsArray.length; i++)
   {
     int thisX = thisObsArray[i].getX();
@@ -93,7 +94,7 @@ public void RenderObstacle()
   }
 }
 
-public void EnterTopPortal()
+public void enterTopPortal()
 {
   fill(#FFFFFF);
   textSize(50);
@@ -110,8 +111,7 @@ public void EnterTopPortal()
     text("Top room doesn't exist.", 120, 400);
   }
 }
-
-public void EnterBottomPortal()
+public void enterBottomPortal()
 {
   fill(#FFFFFF);
   textSize(50);
@@ -128,8 +128,7 @@ public void EnterBottomPortal()
     text("Bottom room doesn't exist.", 120, 400);
   }
 }
-
-public void EnterLeftPortal()
+public void enterLeftPortal()
 {
   fill(#FFFFFF);
   textSize(50);
@@ -146,8 +145,7 @@ public void EnterLeftPortal()
     text("Left room doesn't exist.", 120, 400);
   }
 }
-
-public void EnterRightPortal()
+public void enterRightPortal()
 {
   fill(#FFFFFF);
   textSize(50);
