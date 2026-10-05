@@ -9,12 +9,12 @@ public class SaveManager
   private String filePath = dataPath("mapdata/Data.json");
   Gson gson = new GsonBuilder().setPrettyPrinting().create(); 
   
-  public void InitializeData()
+  public void initializeData()
   {
-    SaveIntoData(new MapData()); 
+    saveIntoData(new MapData()); 
   }
   
-  public MapData LoadFromData()
+  public MapData loadFromData()
   {  
     try (FileReader reader = new FileReader(filePath))
     {
@@ -28,7 +28,7 @@ public class SaveManager
     }
   }
   
-  public void SaveIntoData(MapData mapData)
+  public void saveIntoData(MapData mapData)
   {
     try (FileWriter writer = new FileWriter(filePath))
     { 
