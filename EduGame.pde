@@ -31,8 +31,9 @@ void setup()
   gridSize = width / 11;
   
   player = new Player();
+  
   //mobData[2][1] = appendTo(mobData[2][1], new MobData(5, 6));
-  //obsData[2][2] = appendTo(obsData[2][2], new ObstacleData(2, 3, 1));
+  //obsData[2][2] = appendTo(obsData[2][2], new ObstacleData(1, 3, 1));
   //saver.saveIntoData(mapData);
 }
 

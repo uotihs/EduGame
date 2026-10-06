@@ -109,19 +109,29 @@
       [],
       [
         {
-          "x": 4,
-          "y": 6,
-          "type": 0
+          "obsRow": 2,
+          "obsColumn": 3,
+          "obsType": 0
         },
         {
-          "x": 4,
-          "y": 6,
-          "type": 0
+          "obsRow": 6,
+          "obsColumn": 5,
+          "obsType": 1
         },
         {
-          "x": 2,
-          "y": 3,
-          "type": 1
+          "obsRow": 6,
+          "obsColumn": 7,
+          "obsType": 2
+        },
+        {
+          "obsRow": 3,
+          "obsColumn": 3,
+          "obsType": 1
+        },
+        {
+          "obsRow": 1,
+          "obsColumn": 3,
+          "obsType": 1
         }
       ],
       [],
