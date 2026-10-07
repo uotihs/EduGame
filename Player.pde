@@ -334,7 +334,7 @@ public class Player
   public float getPlayerX() { return playerX; }
   public float getPlayerY() { return playerY; }
   
-  //for testing
+  //for testing, can remove after movement function all done.
   public int getBeginRow() 
   { 
     try
