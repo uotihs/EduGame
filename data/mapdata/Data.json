@@ -109,22 +109,153 @@
       [],
       [
         {
-          "x": 4,
-          "y": 6,
-          "type": 0
+          "obsRow": 2,
+          "obsColumn": 3,
+          "obsType": 0
         },
         {
-          "x": 4,
-          "y": 6,
-          "type": 0
+          "obsRow": 6,
+          "obsColumn": 5,
+          "obsType": 1
         },
         {
-          "x": 2,
-          "y": 3,
-          "type": 1
+          "obsRow": 6,
+          "obsColumn": 7,
+          "obsType": 2
+        },
+        {
+          "obsRow": 3,
+          "obsColumn": 3,
+          "obsType": 1
+        },
+        {
+          "obsRow": 1,
+          "obsColumn": 3,
+          "obsType": 1
         }
       ],
-      [],
+      [
+        {
+          "obsRow": 1,
+          "obsColumn": 1,
+          "obsType": 0
+        },
+        {
+          "obsRow": 1,
+          "obsColumn": 7,
+          "obsType": 0
+        },
+        {
+          "obsRow": 2,
+          "obsColumn": 1,
+          "obsType": 0
+        },
+        {
+          "obsRow": 2,
+          "obsColumn": 4,
+          "obsType": 0
+        },
+        {
+          "obsRow": 2,
+          "obsColumn": 5,
+          "obsType": 0
+        },
+        {
+          "obsRow": 2,
+          "obsColumn": 8,
+          "obsType": 0
+        },
+        {
+          "obsRow": 3,
+          "obsColumn": 1,
+          "obsType": 0
+        },
+        {
+          "obsRow": 3,
+          "obsColumn": 2,
+          "obsType": 0
+        },
+        {
+          "obsRow": 3,
+          "obsColumn": 6,
+          "obsType": 0
+        },
+        {
+          "obsRow": 3,
+          "obsColumn": 9,
+          "obsType": 0
+        },
+        {
+          "obsRow": 4,
+          "obsColumn": 3,
+          "obsType": 0
+        },
+        {
+          "obsRow": 4,
+          "obsColumn": 4,
+          "obsType": 0
+        },
+        {
+          "obsRow": 4,
+          "obsColumn": 7,
+          "obsType": 0
+        },
+        {
+          "obsRow": 5,
+          "obsColumn": 1,
+          "obsType": 0
+        },
+        {
+          "obsRow": 5,
+          "obsColumn": 5,
+          "obsType": 0
+        },
+        {
+          "obsRow": 5,
+          "obsColumn": 7,
+          "obsType": 0
+        },
+        {
+          "obsRow": 5,
+          "obsColumn": 8,
+          "obsType": 0
+        },
+        {
+          "obsRow": 5,
+          "obsColumn": 9,
+          "obsType": 0
+        },
+        {
+          "obsRow": 6,
+          "obsColumn": 2,
+          "obsType": 0
+        },
+        {
+          "obsRow": 6,
+          "obsColumn": 3,
+          "obsType": 0
+        },
+        {
+          "obsRow": 6,
+          "obsColumn": 7,
+          "obsType": 0
+        },
+        {
+          "obsRow": 7,
+          "obsColumn": 4,
+          "obsType": 0
+        },
+        {
+          "obsRow": 7,
+          "obsColumn": 5,
+          "obsType": 0
+        },
+        {
+          "obsRow": 7,
+          "obsColumn": 6,
+          "obsType": 0
+        }
+      ],
       []
     ],
     [

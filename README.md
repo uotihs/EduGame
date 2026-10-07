@@ -14,7 +14,8 @@ only for educational use
 
 
 ## tips
-scripts *must* be placed in the "**code**" folder
+scripts *must* be placed in the "**Sketch**" folder
 <br>
-.db *must* be placed in the "**data**" folder
-
+.json *must* be placed in the "**data/mapdata**" folder
+<br>
+Images *must* be placed in the "**data/images**" folder

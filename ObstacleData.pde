@@ -1,18 +1,18 @@
 
 public class ObstacleData
 {
-  private int x=0;
-  private int y=0;
-  private int type=0;
+  private int obsRow=0;
+  private int obsColumn=0;
+  private int obsType=0;
   
-  public ObstacleData(int inputX, int inputY, int inputType)
+  public ObstacleData(int inputRow, int inputColumn, int inputType)
   {
-    this.x = inputX;
-    this.y = inputY;
-    this.type = inputType;
+    this.obsRow = inputRow;
+    this.obsColumn = inputColumn;
+    this.obsType = inputType;
   }
   
-  public int getX() { return x; }
-  public int getY() { return y; }
-  public int getType() { return type; }
+  public int getObsRow() { return obsRow; }
+  public int getObsColumn() { return obsColumn; }
+  public int getObsType() { return obsType; }
 }

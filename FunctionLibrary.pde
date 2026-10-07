@@ -1,7 +1,10 @@
 import java.util.Arrays;
 import java.lang.IndexOutOfBoundsException;
 
-public float gridSize = 80;
+public enum Dimension
+{
+  ROW, COLUMN
+}
 
 public static <T> T[] appendTo(T[] oldArr, T item)
 {
@@ -53,10 +56,12 @@ public void tmpDisplayRoomInformation()
   {
     ObstacleData thisObs = obsData[currentRow][currentColumn][i];
     text(i +
-        ": LocX: "+ thisObs.x +
-        ", LocY: "+ thisObs.y +
-        ", Type: "+ thisObs.type, 430, 150+i*25); 
+        ": Row: "+ thisObs.getObsRow() +
+        ", Column: "+ thisObs.getObsColumn() +
+        ", Type: "+ thisObs.getObsType(), 430, 150+i*25); 
   }
+  text("Row: "+player.getBeginRow()+"~"+player.getEndRow()+"\n"
+    +"Column: "+player.getBeginColumn()+"~"+player.getEndColumn(), 200, 650);
 }
 
 public void renderBackground()
@@ -87,10 +92,10 @@ public void renderObstacle()
   
   for(int i=0; i < thisObsArray.length; i++)
   {
-    int thisX = thisObsArray[i].getX();
-    int thisY = thisObsArray[i].getY();
-    int thisType = thisObsArray[i].getType() + 8;
-    image(tiles[thisType], gridSize * thisX, gridSize * thisY, gridSize, gridSize);
+    float thisX = thisObsArray[i].getObsColumn() * gridSize;
+    float thisY = thisObsArray[i].getObsRow() * gridSize;
+    int thisType = thisObsArray[i].getObsType() + 8;
+    image(tiles[thisType], thisX, thisY, gridSize, gridSize);
   }
 }
 
