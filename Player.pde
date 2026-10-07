@@ -42,7 +42,7 @@ public class Player
         for(int i=beginIndexRow; i <= last; i++)
         {
           float thisObsLeftX = arrRow[i].getObsColumn() * gridSize;
-          float thisObsRightX = (arrRow[i].getObsColumn() + 1) * gridSize;
+          float thisObsRightX = arrRow[i].getObsColumn() * gridSize + gridSize;
           if(playerX < thisObsRightX && playerX + gridSize > thisObsLeftX)
           {
             isCollided = true;
@@ -83,7 +83,7 @@ public class Player
         for(int i=endIndexRow; i >= first; i--)
         {
           float thisObsLeftX = arrRow[i].getObsColumn() * gridSize;
-          float thisObsRightX = (arrRow[i].getObsColumn() + 1) * gridSize;
+          float thisObsRightX = arrRow[i].getObsColumn() * gridSize + gridSize;
           if(playerX < thisObsRightX && playerX + gridSize > thisObsLeftX)
           {
             isCollided = true;
@@ -91,7 +91,7 @@ public class Player
           }
         }
         if(isCollided) { this.playerY = arrRow[endIndexRow].getObsRow() * gridSize - gridSize; } 
-        else
+        else 
         { 
           this.playerY = nextPlayerY;
           updateAllConditionRanges();
@@ -123,9 +123,9 @@ public class Player
         int last = findLastSameValueIndex(beginIndexColumn, Dimension.COLUMN);
         for(int i=beginIndexColumn; i <= last; i++)
         {
-          float thisObsLeftY = arrColumn[i].getObsRow() * gridSize;
-          float thisObsRightY = (arrColumn[i].getObsRow() + 1) * gridSize;
-          if(playerY < thisObsRightY && playerY + gridSize > thisObsLeftY)
+          float thisObsTopY = arrColumn[i].getObsRow() * gridSize;
+          float thisObsBottomY = arrColumn[i].getObsRow() * gridSize + gridSize;
+          if(playerY < thisObsBottomY && playerY + gridSize > thisObsTopY)
           {
             isCollided = true;
             break;
@@ -164,9 +164,9 @@ public class Player
         int first = findFirstSameValueIndex(endIndexColumn, Dimension.COLUMN);
         for(int i=endIndexColumn; i >= first; i--)
         {
-          float thisObsLeftY = arrColumn[i].getObsRow() * gridSize;
-          float thisObsRightY = (arrColumn[i].getObsRow() + 1) * gridSize;
-          if(playerY < thisObsRightY && playerY + gridSize > thisObsLeftY)
+          float thisObsTopY = arrColumn[i].getObsRow() * gridSize;
+          float thisObsBottomY = arrColumn[i].getObsRow() * gridSize + gridSize;
+          if(playerY < thisObsBottomY && playerY + gridSize > thisObsTopY)
           {
             isCollided = true;
             break;
@@ -221,12 +221,23 @@ public class Player
     
     for(int i = arrRow.length - 1; i >= 0; i--) 
     {
-      if(arrRow[i].getObsRow() * gridSize >=  playerY - 1) 
+      if(arrRow[i].getObsRow() * gridSize >  playerY) 
       {
         endIndexRow = i;
       }
     }
     endIndexRow = findLastSameValueIndex(endIndexRow, Dimension.ROW);
+    
+    if(arrRow[beginIndexRow].getObsRow() == arrRow[0].getObsRow()
+      && arrRow[endIndexRow].getObsRow() == arrRow[0].getObsRow()) 
+    { 
+      beginIndexRow = -1; 
+    }
+    else if(arrRow[beginIndexRow].getObsRow() == arrRow[arrRow.length - 1].getObsRow()
+      && arrRow[endIndexRow].getObsRow() == arrRow[arrRow.length - 1].getObsRow())
+    { 
+      endIndexRow = -1; 
+    }
   }
   private void updateColumnConditionRange()
   {
@@ -251,12 +262,23 @@ public class Player
     
     for(int i = arrColumn.length - 1; i >= 0; i--)
     {
-      if(arrColumn[i].getObsColumn() * gridSize > playerX - 1)
+      if(arrColumn[i].getObsColumn() * gridSize > playerX)
       {
         endIndexColumn = i;  
       }
     }
     endIndexColumn = findLastSameValueIndex(endIndexColumn, Dimension.COLUMN);
+    
+    if(arrColumn[beginIndexColumn].getObsColumn() == arrColumn[0].getObsColumn()
+      && arrColumn[endIndexColumn].getObsColumn() == arrColumn[0].getObsColumn()) 
+    { 
+      beginIndexColumn = -1; 
+    }
+    else if(arrColumn[beginIndexColumn].getObsColumn() == arrColumn[arrColumn.length - 1].getObsColumn()
+      && arrColumn[endIndexColumn].getObsColumn() == arrColumn[arrColumn.length - 1].getObsColumn())
+    { 
+      endIndexColumn = -1; 
+    }
   }
 
   private int findLastSameValueIndex(int index, Dimension dimension)
@@ -311,4 +333,50 @@ public class Player
   
   public float getPlayerX() { return playerX; }
   public float getPlayerY() { return playerY; }
+  
+  //for testing
+  public int getBeginRow() 
+  { 
+    try
+    {
+      return arrRow[beginIndexRow].getObsRow();
+    }
+    catch(IndexOutOfBoundsException e)
+    {
+      return -1;
+    }
+  }
+  public int getEndRow()
+  { 
+    try
+    {
+      return arrRow[endIndexRow].getObsRow();
+    }
+    catch(IndexOutOfBoundsException e)
+    {
+      return -1;
+    }
+  }
+  public int getBeginColumn()
+  { 
+    try
+    {
+      return arrColumn[beginIndexColumn].getObsColumn();
+    }
+    catch(IndexOutOfBoundsException e)
+    {
+      return -1;
+    }
+  }
+  public int getEndColumn()
+  { 
+    try
+    {
+      return arrColumn[endIndexColumn].getObsColumn();
+    }
+    catch(IndexOutOfBoundsException e)
+    {
+      return -1;
+    }
+  }
 }

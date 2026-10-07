@@ -60,6 +60,8 @@ public void tmpDisplayRoomInformation()
         ", Column: "+ thisObs.getObsColumn() +
         ", Type: "+ thisObs.getObsType(), 430, 150+i*25); 
   }
+  text("Row: "+player.getBeginRow()+"~"+player.getEndRow()+"\n"
+    +"Column: "+player.getBeginColumn()+"~"+player.getEndColumn(), 200, 650);
 }
 
 public void renderBackground()
