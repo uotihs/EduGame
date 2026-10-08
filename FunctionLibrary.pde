@@ -48,9 +48,9 @@ public void tmpDisplayRoomInformation()
   {
     MobData thisMob = mobData[currentRow][currentColumn][i];
     text(i +
-        ": SpawnX: "+ thisMob.spawnX +
-        ", SpawnY: "+ thisMob.spawnY +
-        ", Health: "+ thisMob.health, 60, 150+i*25);
+        ": Row: "+ thisMob.getMobRow() +
+        ", Column: "+ thisMob.getMobColumn() +
+        ", Health: "+ thisMob.getMobHealth(), 60, 150+i*25);
   }
   for(int i=0; i < obsData[currentRow][currentColumn].length; i++)
   {
