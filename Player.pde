@@ -10,12 +10,12 @@ public class Player
   
   public Player()
   {
-    updateObstacleArray();
-    this.playerX = width / 2 - gridSize / 2;
-    this.playerY = height / 2 - gridSize / 2;
-    updateAllConditionRanges();
-    
     this.playerSize = gridSize;
+    
+    updateObstacleArray();
+    this.playerX = width / 2 - playerSize / 2;
+    this.playerY = height / 2 - playerSize / 2;
+    updateAllConditionRanges();
   }
   
   public void moveUp()
@@ -25,8 +25,8 @@ public class Player
     { 
       enterTopPortal();
       updateObstacleArray();
-      this.playerX = width / 2 - gridSize / 2;
-      this.playerY = height - gridSize * 2;
+      this.playerX = width / 2 - playerSize / 2;
+      this.playerY = height - gridSize - playerSize;
       updateAllConditionRanges();
       return;
     }
@@ -43,7 +43,7 @@ public class Player
         {
           float thisObsLeftX = arrRow[i].getObsColumn() * gridSize;
           float thisObsRightX = arrRow[i].getObsColumn() * gridSize + gridSize;
-          if(playerX < thisObsRightX && playerX + gridSize > thisObsLeftX)
+          if(playerX < thisObsRightX && playerX + playerSize > thisObsLeftX)
           {
             isCollided = true;
             break;
@@ -66,14 +66,14 @@ public class Player
     { 
       enterBottomPortal();
       updateObstacleArray();
-      this.playerX = width / 2 - gridSize / 2;
+      this.playerX = width / 2 - playerSize / 2;
       this.playerY = gridSize * 1;
       updateAllConditionRanges();
       return;
     }
     if(arrRow.length == 0 || endIndexRow == -1)
     {
-      this.playerY = Math.min(height - gridSize * 2, nextPlayerY);
+      this.playerY = Math.min(height - gridSize - playerSize, nextPlayerY);
       return; 
     }
     if(nextPlayerY > (arrRow[endIndexRow].getObsRow() - 1) * gridSize)
@@ -84,7 +84,7 @@ public class Player
         {
           float thisObsLeftX = arrRow[i].getObsColumn() * gridSize;
           float thisObsRightX = arrRow[i].getObsColumn() * gridSize + gridSize;
-          if(playerX < thisObsRightX && playerX + gridSize > thisObsLeftX)
+          if(playerX < thisObsRightX && playerX + playerSize > thisObsLeftX)
           {
             isCollided = true;
             break;
@@ -98,7 +98,7 @@ public class Player
         }
       }
       else { this.playerY = nextPlayerY; }
-      if(nextPlayerY > height - gridSize * 2) { this.playerY = height - gridSize * 2; }
+      if(nextPlayerY > height - gridSize - playerSize) { this.playerY = height - gridSize - playerSize; }
   }
   public void moveLeft() 
   { 
@@ -107,8 +107,8 @@ public class Player
     { 
       enterLeftPortal();
       updateObstacleArray();
-      this.playerX = width - gridSize * 2;
-      this.playerY = height / 2 - gridSize / 2;
+      this.playerX = width - gridSize - playerSize;
+      this.playerY = height / 2 - playerSize / 2;
       updateAllConditionRanges();
       return;
     }
@@ -125,7 +125,7 @@ public class Player
         {
           float thisObsTopY = arrColumn[i].getObsRow() * gridSize;
           float thisObsBottomY = arrColumn[i].getObsRow() * gridSize + gridSize;
-          if(playerY < thisObsBottomY && playerY + gridSize > thisObsTopY)
+          if(playerY < thisObsBottomY && playerY + playerSize > thisObsTopY)
           {
             isCollided = true;
             break;
@@ -149,13 +149,13 @@ public class Player
       enterRightPortal();
       updateObstacleArray();
       this.playerX = gridSize * 1;
-      this.playerY = height / 2 - gridSize / 2;
+      this.playerY = height / 2 - playerSize / 2;
       updateAllConditionRanges();
       return;
     }
     if(arrColumn.length == 0 || endIndexColumn == -1)
     {
-      this.playerX = Math.min(width - gridSize * 2, nextPlayerX);
+      this.playerX = Math.min(width - gridSize - playerSize, nextPlayerX);
       return; 
     }
     if(nextPlayerX > (arrColumn[endIndexColumn].getObsColumn() - 1) * gridSize)
@@ -166,7 +166,7 @@ public class Player
         {
           float thisObsTopY = arrColumn[i].getObsRow() * gridSize;
           float thisObsBottomY = arrColumn[i].getObsRow() * gridSize + gridSize;
-          if(playerY < thisObsBottomY && playerY + gridSize > thisObsTopY)
+          if(playerY < thisObsBottomY && playerY + playerSize > thisObsTopY)
           {
             isCollided = true;
             break;
@@ -180,7 +180,7 @@ public class Player
         }
       }
       else { this.playerX = nextPlayerX; }
-      if(nextPlayerX > width - gridSize * 2) { this.playerX = width - gridSize * 2; }
+      if(nextPlayerX > width - gridSize - playerSize) { this.playerX = width - gridSize - playerSize; }
   }
   
   private void updateObstacleArray()
@@ -318,13 +318,13 @@ public class Player
   
   private boolean isTouchingPoint(float pointX, float pointY)
   {
-    return ((playerX < pointX) && (playerX + gridSize > pointX)
-          && (playerY < pointY) && (playerY + gridSize > pointY));
+    return ((playerX < pointX) && (playerX + playerSize > pointX)
+          && (playerY < pointY) && (playerY + playerSize > pointY));
   }
   
   public void renderPlayer()
   {
-    // should do image(charcterTiles[i], playerX, playerY, playerWidth, playerHeight); here.
+    // should do image(charcterTiles[i], playerX, playerY, playerSize, playerSize); here.
     // using rect() as tmp rendering object.
     noStroke();
     fill(#F72A2A);
