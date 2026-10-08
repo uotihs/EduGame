@@ -23,17 +23,21 @@ public class MapData
 
 public class MobData
 {
-  private int spawnX=0;
-  private int spawnY=0;
-  private int health=10;
+  private int mobRow=0;
+  private int mobColumn=0;
+  private int mobHealth=10;
   
-  public MobData(int inputX, int inputY)
+  public MobData(int inputRow, int inputColumn)
   {
-    this.spawnX = inputX;
-    this.spawnY = inputY;
+    this.mobRow = inputRow;
+    this.mobColumn = inputColumn;
   }
   
-  public void setHealth(int value) { health = value; }
+  public int getMobRow() { return mobRow; }
+  public int getMobColumn() { return mobColumn; }
+  public int getMobHealth() { return mobHealth; }
+  
+  public void setMobHealth(int value) { mobHealth = value; }
 }
 
 public class ObstacleData

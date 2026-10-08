@@ -55,19 +55,19 @@
       [],
       [
         {
-          "spawnX": 1,
-          "spawnY": 2,
-          "health": 10
+          "mobRow": 0,
+          "mobColumn": 0,
+          "mobHealth": 0
         },
         {
-          "spawnX": 3,
-          "spawnY": 4,
-          "health": 10
+          "mobRow": 0,
+          "mobColumn": 0,
+          "mobHealth": 0
         },
         {
-          "spawnX": 5,
-          "spawnY": 6,
-          "health": 10
+          "mobRow": 0,
+          "mobColumn": 0,
+          "mobHealth": 0
         }
       ],
       [],
