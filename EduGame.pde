@@ -6,6 +6,7 @@ ObstacleData[][][] obsData;
 
 float gridSize;
 int currentRow = 2, currentColumn = 2;
+ObstacleData[] arrRow, arrColumn;
 Player player;
 
 PImage backgroundImage;
@@ -23,13 +24,15 @@ void setup()
   obsData = mapData.obsData;
   saver.saveIntoData(mapData);
   
+  updateObstacleArray();
+
   initializeImages();
   
   tmpPrintRoomDisData();
   
   size(880, 720);
   gridSize = width / 11;
-  
+
   player = new Player();
   
   //mobData[2][1] = appendTo(mobData[2][1], new MobData(5, 6));

@@ -6,6 +6,16 @@ public enum Dimension
   ROW, COLUMN
 }
 
+public class IndexRange
+{
+  public int begin=0, end=0;
+  public IndexRange(int inputBeginIndex, int inputEndIndex)
+  {
+    this.begin = inputBeginIndex;
+    this.end = inputEndIndex;
+  }
+}
+
 public static <T> T[] appendTo(T[] oldArr, T item)
 {
   T[] newArr = Arrays.copyOf(oldArr, oldArr.length + 1);
@@ -13,6 +23,142 @@ public static <T> T[] appendTo(T[] oldArr, T item)
   return newArr;
 }
 
+public void updateObstacleArray()
+{
+  ObstacleData[] thisObsData = obsData[currentRow][currentColumn];
+  arrRow = Arrays.copyOf(thisObsData, thisObsData.length);
+  arrColumn = Arrays.copyOf(thisObsData, thisObsData.length);
+    
+  Arrays.sort(arrRow, Comparator.comparingInt(obs -> obs.getObsRow()));
+  Arrays.sort(arrColumn, Comparator.comparingInt(obs -> obs.getObsColumn()));
+}
+
+public IndexRange getRowConditionRange(float inputY)
+{
+  if(arrRow.length == 0) 
+  { 
+    return new IndexRange(-1, -1); 
+  }
+  
+  int rowBeginIndex = 0, rowEndIndex = arrRow.length - 1;
+  
+  for(int i = 0; i < arrRow.length; i++) 
+  {
+    if((getRowValue(i) + 1) * gridSize <= inputY + 1) 
+    {
+      rowBeginIndex = i;
+    }
+  }
+  rowBeginIndex = findFirstSameValueIndex(rowBeginIndex, Dimension.ROW);
+    
+  for(int i = arrRow.length - 1; i >= 0; i--) 
+  {
+    if(getRowValue(i) * gridSize >  inputY) 
+    {
+      rowEndIndex = i;
+    }
+  }
+  rowEndIndex = findLastSameValueIndex(rowEndIndex, Dimension.ROW);
+    
+  if(getRowValue(rowBeginIndex) == getRowValue(0)
+    && getRowValue(rowEndIndex) == getRowValue(0)) 
+  { 
+    rowBeginIndex = -1; 
+  }
+  else if(getRowValue(rowBeginIndex) == getRowValue(arrRow.length - 1)
+    && getRowValue(rowEndIndex) == getRowValue(arrRow.length - 1))
+  { 
+    rowEndIndex = -1; 
+  }
+  return new IndexRange(rowBeginIndex, rowEndIndex);
+}
+
+public IndexRange getColumnConditionRange(float inputX)
+{
+  if(arrColumn.length == 0) 
+  {
+    return new IndexRange(-1, -1); 
+  }
+
+  int columnBeginIndex = 0, columnEndIndex = arrColumn.length - 1;
+    
+  for(int i = 0; i < arrColumn.length; i++) 
+  {
+    if((arrColumn[i].getObsColumn() + 1) * gridSize <= inputX + 1)
+    {
+      columnBeginIndex = i;
+    }
+  }
+  columnBeginIndex = findFirstSameValueIndex(columnBeginIndex, Dimension.COLUMN);
+    
+  for(int i = arrColumn.length - 1; i >= 0; i--)
+  {
+    if(getColumnValue(i) * gridSize > inputX)
+    {
+      columnEndIndex = i;  
+    }
+  }
+  columnEndIndex = findLastSameValueIndex(columnEndIndex, Dimension.COLUMN);
+    
+  if(getColumnValue(columnBeginIndex) == getColumnValue(0)
+    && getColumnValue(columnEndIndex) == getColumnValue(0)) 
+  { 
+    columnBeginIndex = -1; 
+  }
+  else if(getColumnValue(columnBeginIndex) == getColumnValue(arrColumn.length - 1)
+    && getColumnValue(columnEndIndex) == getColumnValue(arrColumn.length - 1))
+  { 
+    columnEndIndex = -1; 
+  }
+  return new IndexRange(columnBeginIndex, columnEndIndex);
+}
+
+private int findLastSameValueIndex(int index, Dimension dimension)
+{
+  switch(dimension)
+  {
+    case ROW:
+      while(index + 1 < arrRow.length &&
+        arrRow[index].getObsRow() == arrRow[index + 1].getObsRow()) { index += 1; }
+      break;
+    case COLUMN:
+      while(index + 1 < arrColumn.length &&
+        arrColumn[index].getObsColumn() == arrColumn[index + 1].getObsColumn()) { index += 1; }
+      break;
+    default:
+      throw new IllegalArgumentException("Unidentified dimension: "+dimension);
+  }
+  return index;
+}
+  
+public int findFirstSameValueIndex(int index, Dimension dimension)
+{
+  switch(dimension)
+  {
+    case ROW:
+      while(index > 0 &&
+        arrRow[index].getObsRow() == arrRow[index - 1].getObsRow()) { index -= 1; }
+      break;
+    case COLUMN:
+      while(index > 0 &&
+        arrColumn[index].getObsColumn() == arrColumn[index - 1].getObsColumn()) { index -= 1; }
+      break;
+    default:
+      throw new IllegalArgumentException("Unidentified dimension: "+dimension);
+  }
+  return index;
+}
+  
+public int getRowValue(int rowIndex)
+{
+  return arrRow[rowIndex].getObsRow();
+}
+
+public int getColumnValue(int columnIndex)
+{
+  return arrColumn[columnIndex].getObsColumn();
+}
+  
 public void initializeImages()
 {
   backgroundImage = loadImage("images/background.png");
@@ -109,7 +255,11 @@ public void enterTopPortal()
     { 
       text("Top room doesn't exist.", 120, 400); 
     }
-    else { currentRow -= 1; }
+    else
+    {
+      currentRow -= 1;
+      updateObstacleArray();
+    }
   }
   catch(IndexOutOfBoundsException e)
   {
@@ -126,7 +276,11 @@ public void enterBottomPortal()
     { 
       text("Bottom room doesn't exist.", 120, 400); 
     }
-    else { currentRow += 1; }
+    else
+    {
+      currentRow += 1;
+      updateObstacleArray();
+    }
   }
   catch(IndexOutOfBoundsException e)
   {
@@ -143,7 +297,11 @@ public void enterLeftPortal()
     { 
       text("Left room doesn't exist.", 120, 400); 
     }
-    else { currentColumn -= 1; }
+    else
+    {
+      currentColumn -= 1;
+      updateObstacleArray();
+    }
   }
   catch(IndexOutOfBoundsException e)
   {
@@ -160,7 +318,11 @@ public void enterRightPortal()
     { 
       text("Right room doesn't exist.", 120, 400); 
     }
-    else { currentColumn += 1; }
+    else
+    {
+      currentColumn += 1;
+      updateObstacleArray();
+    }
   }
   catch(IndexOutOfBoundsException e)
   {
