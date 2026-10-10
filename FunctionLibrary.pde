@@ -1,5 +1,6 @@
 import java.util.Arrays;
 import java.lang.IndexOutOfBoundsException;
+import java.util.Comparator;
 
 public enum Dimension
 {
@@ -210,26 +211,46 @@ public void tmpDisplayRoomInformation()
     +"Column: "+player.getBeginColumn()+"~"+player.getEndColumn(), 200, 650);
 }
 
+public boolean hasTopRoom()
+{
+  boolean topRoomExist = true;
+  try { if(roomDisData[currentRow - 1][currentColumn] == -1) { topRoomExist = false; } }
+  catch(IndexOutOfBoundsException e) { topRoomExist = false; }
+  return topRoomExist;
+}
+
+public boolean hasBottomRoom()
+{
+  boolean bottomRoomExist = true;
+  try { if(roomDisData[currentRow + 1][currentColumn] == -1) { bottomRoomExist = false; } }
+  catch(IndexOutOfBoundsException e) { bottomRoomExist = false; }
+  return bottomRoomExist;
+}
+
+public boolean hasLeftRoom()
+{
+  boolean leftRoomExist = true;
+  try { if(roomDisData[currentRow][currentColumn - 1] == -1) { leftRoomExist = false; } }
+  catch(IndexOutOfBoundsException e) { leftRoomExist = false; }
+  return leftRoomExist;
+}
+
+public boolean hasRightRoom()
+{
+  boolean rightRoomExist = true;
+  try { if(roomDisData[currentRow][currentColumn + 1] == -1) { rightRoomExist = false; } }
+  catch(IndexOutOfBoundsException e) { rightRoomExist = false; }
+  return rightRoomExist;
+}
+
 public void renderBackground()
 {
   image(backgroundImage, 0, 0, width, height);
   
-  boolean topRoomExist = true, bottomRoomExist = true, 
-          leftRoomExist = true, rightRoomExist = true;
-  try { if(roomDisData[currentRow - 1][currentColumn] == -1) { topRoomExist = false; } }
-  catch(IndexOutOfBoundsException e) { topRoomExist = false; }
-  try { if(roomDisData[currentRow + 1][currentColumn] == -1) { bottomRoomExist = false; } }
-  catch(IndexOutOfBoundsException e) { bottomRoomExist = false; }
-  try { if(roomDisData[currentRow][currentColumn - 1] == -1) { leftRoomExist = false; } }
-  catch(IndexOutOfBoundsException e) { leftRoomExist = false; }
-  try { if(roomDisData[currentRow][currentColumn + 1] == -1) { rightRoomExist = false; } }
-  catch(IndexOutOfBoundsException e) { rightRoomExist = false; }
-  
-  int gridSize = width / 11;
-  if(topRoomExist) { image(tiles[0], gridSize * 5, 0, gridSize, gridSize); }
-  if(bottomRoomExist) { image(tiles[2], gridSize * 5, height - gridSize, gridSize, gridSize); }
-  if(leftRoomExist) { image(tiles[4], 0, gridSize * 4, gridSize, gridSize); }
-  if(rightRoomExist) { image(tiles[6], width - gridSize, gridSize * 4, gridSize, gridSize); }
+  if(hasTopRoom()) { image(tiles[0], gridSize * 5, 0, gridSize, gridSize); }
+  if(hasBottomRoom()) { image(tiles[2], gridSize * 5, height - gridSize, gridSize, gridSize); }
+  if(hasLeftRoom()) { image(tiles[4], 0, gridSize * 4, gridSize, gridSize); }
+  if(hasRightRoom()) { image(tiles[6], width - gridSize, gridSize * 4, gridSize, gridSize); }
 }
 
 public void renderObstacle()
