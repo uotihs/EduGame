@@ -55,19 +55,19 @@
       [],
       [
         {
-          "mobRow": 0,
-          "mobColumn": 0,
-          "mobHealth": 0
+          "mobRow": 2,
+          "mobColumn": 2,
+          "mobHealth": -1
         },
         {
-          "mobRow": 0,
-          "mobColumn": 0,
-          "mobHealth": 0
+          "mobRow": 5,
+          "mobColumn": 3,
+          "mobHealth": 100
         },
         {
-          "mobRow": 0,
-          "mobColumn": 0,
-          "mobHealth": 0
+          "mobRow": 6,
+          "mobColumn": 6,
+          "mobHealth": 200
         }
       ],
       [],
@@ -106,7 +106,33 @@
     ],
     [
       [],
-      [],
+      [
+        {
+          "obsRow": 5,
+          "obsColumn": 5,
+          "obsType": 0
+        },
+        {
+          "obsRow": 2,
+          "obsColumn": 4,
+          "obsType": 0
+        },
+        {
+          "obsRow": 1,
+          "obsColumn": 2,
+          "obsType": 0
+        },
+        {
+          "obsRow": 6,
+          "obsColumn": 8,
+          "obsType": 0
+        },
+        {
+          "obsRow": 5,
+          "obsColumn": 8,
+          "obsType": 0
+        }
+      ],
       [
         {
           "obsRow": 2,
