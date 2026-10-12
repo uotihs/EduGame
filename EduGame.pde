@@ -8,6 +8,7 @@ float gridSize;
 int currentRow = 2, currentColumn = 2;
 ObstacleData[] arrRow, arrColumn;
 Player player;
+Mob[] mobArr;
 
 PImage backgroundImage;
 PImage[] tiles = new PImage[11];
@@ -24,7 +25,8 @@ void setup()
   obsData = mapData.obsData;
   saver.saveIntoData(mapData);
   
-  updateObstacleArray();
+  updateObstaclesArray();
+  updateMobsArray();
 
   initializeImages();
   
@@ -36,7 +38,7 @@ void setup()
   player = new Player();
   
   //mobData[2][1] = appendTo(mobData[2][1], new MobData(5, 6));
-  //obsData[2][3] = appendTo(obsData[2][3], new ObstacleData(1, 1, 0));
+  //obsData[2][1] = appendTo(obsData[2][1], new ObstacleData(8, 5, 0));
   //saver.saveIntoData(mapData);
 }
 
@@ -44,7 +46,13 @@ void draw()
 {
   renderBackground();
   player.renderPlayer();
-  renderObstacle();
+  renderObstacles();
+  clearDeadMobs();
+  for(Mob thisMob: mobArr)
+  {
+    thisMob.move();
+  }
+  renderMobs();
   tmpDisplayRoomInformation();
 }
 

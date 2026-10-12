@@ -17,6 +17,25 @@ public class IndexRange
   }
 }
 
+public class Gap
+{
+  public int gapRow=0, gapColumn=0, gapDirection=0;
+  
+  Gap(int inputRow, int inputColumn, int inputDirection)
+  {
+    this.gapRow = inputRow;
+    this.gapColumn = inputColumn;
+    this.gapDirection = inputDirection;
+  }
+  
+  public boolean equals(Gap o)
+  {
+    if(this == o) { return true; }
+    else if(o == null) { return false; }
+    return gapRow == o.gapRow && gapColumn == o.gapColumn;
+  }
+}
+
 public static <T> T[] appendTo(T[] oldArr, T item)
 {
   T[] newArr = Arrays.copyOf(oldArr, oldArr.length + 1);
@@ -24,7 +43,51 @@ public static <T> T[] appendTo(T[] oldArr, T item)
   return newArr;
 }
 
-public void updateObstacleArray()
+public static <T> T[] removeFrom(T[] oldArr, T item)
+{
+  for(int i=0; i < oldArr.length; i++)
+  {
+    if(oldArr[i].equals(item))
+    {
+      T[] newArr = Arrays.copyOf(oldArr, oldArr.length - 1);
+      System.arraycopy(oldArr, 0, newArr, 0, i);
+      System.arraycopy(oldArr, i + 1, newArr, i, oldArr.length - i - 1);
+      return newArr;
+    }
+  }
+  return oldArr;
+}
+
+public void updateMobsArray()
+{
+  mobArr = new Mob[]{};
+  for(MobData thisMobData: mobData[currentRow][currentColumn])
+  {
+    mobArr = appendTo(mobArr, new Mob(thisMobData));
+  }
+}
+
+public void clearDeadMobs()
+{
+  mobArr = Arrays.stream(mobArr)
+    .filter(mob -> !mob.isDead())
+    .toArray(Mob[]::new);
+}
+
+public void renderMobs()
+{
+  int d=0;
+  for(Mob thisMob: mobArr)
+  {
+    thisMob.renderMob();
+    text("mobX: "+thisMob.getMobX()+" mobY: "+thisMob.getMobY()+" hp: "+thisMob.getMobHealth()
+      +"\nTarget: ("+thisMob.waypoint[0]+", "+thisMob.waypoint[1]+")."
+      +"\nDirection: "+thisMob.waypoint[2], 300, d * 100 + 300);
+    d += 1;
+  }
+}
+
+public void updateObstaclesArray()
 {
   ObstacleData[] thisObsData = obsData[currentRow][currentColumn];
   arrRow = Arrays.copyOf(thisObsData, thisObsData.length);
@@ -253,7 +316,7 @@ public void renderBackground()
   if(hasRightRoom()) { image(tiles[6], width - gridSize, gridSize * 4, gridSize, gridSize); }
 }
 
-public void renderObstacle()
+public void renderObstacles()
 {
   ObstacleData[] thisObsArray = obsData[currentRow][currentColumn];
   
@@ -279,7 +342,8 @@ public void enterTopPortal()
     else
     {
       currentRow -= 1;
-      updateObstacleArray();
+      updateObstaclesArray();
+      updateMobsArray();
     }
   }
   catch(IndexOutOfBoundsException e)
@@ -300,7 +364,8 @@ public void enterBottomPortal()
     else
     {
       currentRow += 1;
-      updateObstacleArray();
+      updateObstaclesArray();
+      updateMobsArray();
     }
   }
   catch(IndexOutOfBoundsException e)
@@ -321,7 +386,8 @@ public void enterLeftPortal()
     else
     {
       currentColumn -= 1;
-      updateObstacleArray();
+      updateObstaclesArray();
+      updateMobsArray();
     }
   }
   catch(IndexOutOfBoundsException e)
@@ -342,7 +408,8 @@ public void enterRightPortal()
     else
     {
       currentColumn += 1;
-      updateObstacleArray();
+      updateObstaclesArray();
+      updateMobsArray();
     }
   }
   catch(IndexOutOfBoundsException e)

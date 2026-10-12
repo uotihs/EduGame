@@ -24,6 +24,7 @@ public class Player
       this.playerX = width / 2 - playerSize / 2;
       this.playerY = height - gridSize - playerSize;
       updateAllConditionRanges();
+      onPlayerChangedConditionsRange();
       return;
     }
     if(arrRow.length == 0 || rowIndexRange.begin == -1)
@@ -50,6 +51,7 @@ public class Player
         { 
           this.playerY = nextPlayerY;
           updateAllConditionRanges();
+          onPlayerChangedConditionsRange();
         }
       }
       else { this.playerY = nextPlayerY; }
@@ -64,6 +66,7 @@ public class Player
       this.playerX = width / 2 - playerSize / 2;
       this.playerY = gridSize * 1;
       updateAllConditionRanges();
+      onPlayerChangedConditionsRange();
       return;
     }
     if(arrRow.length == 0 || rowIndexRange.end == -1)
@@ -90,6 +93,7 @@ public class Player
         { 
           this.playerY = nextPlayerY;
           updateAllConditionRanges();
+          onPlayerChangedConditionsRange();
         }
       }
       else { this.playerY = nextPlayerY; }
@@ -104,6 +108,7 @@ public class Player
       this.playerX = width - gridSize - playerSize;
       this.playerY = height / 2 - playerSize / 2;
       updateAllConditionRanges();
+      onPlayerChangedConditionsRange();
       return;
     }
     if(arrColumn.length == 0 || columnIndexRange.begin == -1)
@@ -130,6 +135,7 @@ public class Player
         { 
           this.playerX = nextPlayerX;
           updateAllConditionRanges();
+          onPlayerChangedConditionsRange();
         }
       }
       else { this.playerX = nextPlayerX; }
@@ -144,6 +150,7 @@ public class Player
       this.playerX = gridSize * 1;
       this.playerY = height / 2 - playerSize / 2;
       updateAllConditionRanges();
+      onPlayerChangedConditionsRange();
       return;
     }
     if(arrColumn.length == 0 || columnIndexRange.end == -1)
@@ -170,6 +177,7 @@ public class Player
         { 
           this.playerX = nextPlayerX;
           updateAllConditionRanges();
+          onPlayerChangedConditionsRange();
         }
       }
       else { this.playerX = nextPlayerX; }
@@ -202,6 +210,19 @@ public class Player
           && (playerY < pointY) && (playerY + playerSize > pointY));
   }
   
+  private void onPlayerChangedConditionsRange()
+  {
+    for(Mob thisMob: mobArr)
+    {
+      if(!thisMob.isInSameSpace() && thisMob.waypoint[2] != -1)
+      {
+        thisMob.updateAllConditionRanges();
+        thisMob.updateWaypoint();
+      }
+    }
+    return;
+  }
+  
   public void renderPlayer()
   {
     // should do image(charcterTiles[i], playerX, playerY, playerSize, playerSize); here.
@@ -213,6 +234,8 @@ public class Player
   
   public float getPlayerX() { return playerX; }
   public float getPlayerY() { return playerY; }
+  public IndexRange getRowIndexRange() { return rowIndexRange; }
+  public IndexRange getColumnIndexRange() { return columnIndexRange; }
   
   //for testing, can remove after movement function all done.
   public int getBeginRow() 
