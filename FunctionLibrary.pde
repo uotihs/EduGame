@@ -28,12 +28,12 @@ public class Gap
     this.gapDirection = inputDirection;
   }
   
-  public boolean equals(Gap o)
-  {
-    if(this == o) { return true; }
-    else if(o == null) { return false; }
-    return gapRow == o.gapRow && gapColumn == o.gapColumn;
-  }
+   public boolean matches(int targetRow, int targetColumn, int targetDirection)
+   {
+     return gapRow == targetRow && 
+      gapColumn == targetColumn &&
+      gapDirection == targetDirection;
+   }
 }
 
 public static <T> T[] appendTo(T[] oldArr, T item)
@@ -81,7 +81,8 @@ public void renderMobs()
   {
     thisMob.renderMob();
     text("mobX: "+thisMob.getMobX()+" mobY: "+thisMob.getMobY()+" hp: "+thisMob.getMobHealth()
-      +"\nTarget: ("+thisMob.waypoint[0]+", "+thisMob.waypoint[1]+")."
+      +"\nTarget: ("+thisMob.waypoint[0]+", "+thisMob.waypoint[1]+")"
+      +"\nTargetRC: ("+thisMob.waypoint[1]/gridSize+", "+thisMob.waypoint[0]/gridSize+")"
       +"\nDirection: "+thisMob.waypoint[2], 300, d * 100 + 300);
     d += 1;
   }
