@@ -68,35 +68,18 @@ public static <T> T[] appendTo(T[] oldArr, T item)
   return newArr;
 }
 
-public static <T> T[] removeFrom(T[] oldArr, T item)
-{
-  for(int i=0; i < oldArr.length; i++)
-  {
-    if(oldArr[i].equals(item))
-    {
-      T[] newArr = Arrays.copyOf(oldArr, oldArr.length - 1);
-      System.arraycopy(oldArr, 0, newArr, 0, i);
-      System.arraycopy(oldArr, i + 1, newArr, i, oldArr.length - i - 1);
-      return newArr;
-    }
-  }
-  return oldArr;
-}
-
 public void updateMobsArray()
 {
-  mobArr = new Mob[]{};
+  mobArr = new ArrayList<Mob> ();
   for(MobData thisMobData: mobData[currentRow][currentColumn])
   {
-    mobArr = appendTo(mobArr, new Mob(thisMobData));
+    mobArr.add(new Mob(thisMobData));
   }
 }
 
 public void clearDeadMobs()
 {
-  mobArr = Arrays.stream(mobArr)
-    .filter(mob -> !mob.isDead())
-    .toArray(Mob[]::new);
+  mobArr.removeIf(mob -> mob.isDead());
 }
 
 public void renderMobs()
