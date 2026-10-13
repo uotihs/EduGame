@@ -4,7 +4,7 @@ public class Mob
 {
   private float mobX=0, mobY=0, mobSize=0;
   private float speed=1;
-  private float[] waypoint = new float[]{0, 0, 0};
+  private Waypoint waypoint = new Waypoint(0, 0, Direction.FACE_UP);
   private int mobType=0, mobHealth=0;
   private IndexRange rowIndexRange = new IndexRange(0, 0);
   private IndexRange columnIndexRange = new IndexRange(0, 0);
@@ -47,31 +47,35 @@ public class Mob
   
   private void walkTowardWaypoint()
   {
-    float distanceToWaypoint = dist(waypoint[0], waypoint[1], mobX, mobY);
+    float thisWaypointX = waypoint.getWaypointX(),
+      thisWaypointY = waypoint.getWaypointY();
+      
+    float distanceToWaypoint = dist(thisWaypointX, thisWaypointY, mobX, mobY);
     //float distanceToPlayer = dist(player.playerX, player.playerY, mobX, mobY);
     if(distanceToWaypoint < speed)
     {
-      if(waypoint[2] != -1)
+      if(waypoint.getWaypointDir() != Direction.CROSSING_GAP)
       {
-        int direction = (int)waypoint[2];
-        if(direction == 0) { waypoint[1] -= gridSize; }
-        else if(direction == 1) { waypoint[0] += gridSize; }
-        else if(direction == 2) { waypoint[1] += gridSize; }
-        else { waypoint[0] -= gridSize; }
+        Direction thisDir = waypoint.getWaypointDir();
+        if(thisDir == Direction.FACE_UP) { waypoint.addWaypointY(gridSize * -1); }
+        else if(thisDir == Direction.FACE_DOWN) { waypoint.addWaypointY(gridSize); }
+        else if(thisDir == Direction.FACE_LEFT) { waypoint.addWaypointX(gridSize * -1); }
+        else if(thisDir == Direction.FACE_RIGHT) { waypoint.addWaypointX(gridSize); }
+        else { throw new IllegalArgumentException("Invalid direction: "+thisDir+".");}
         updateAllConditionRanges();
-        waypoint[2] = -1;
+        waypoint.setWaypointDir(Direction.CROSSING_GAP);
         return;
       }
       else
       {
-        this.mobX = waypoint[0];
-        this.mobY = waypoint[1];
+        this.mobX = thisWaypointX;
+        this.mobY = thisWaypointY;
         updateAllConditionRanges();
         updateWaypoint();
         return;
       }
     }
-    walkTowardTo(waypoint[0], waypoint[1]);
+    walkTowardTo(thisWaypointX, thisWaypointY);
   }
   
   private void walkTowardTo(float targetX, float targetY)
@@ -90,6 +94,7 @@ public class Mob
     if(verticalCollide && horizontalCollide)
     {
       //updateWaypoint();
+      //or probably do something to try to escape the situation.
       return;
     }
     else if(verticalCollide && !horizontalCollide)
@@ -101,9 +106,7 @@ public class Mob
         updateWaypoint();
       }
       else
-      {
-        this.mobX += stepX; 
-      }
+      { this.mobX += stepX; }
     }
     else if(!verticalCollide && horizontalCollide)
     {
@@ -114,9 +117,7 @@ public class Mob
         updateWaypoint();
       }
       else
-      {
-        this.mobY += stepY; 
-      } 
+      { this.mobY += stepY; } 
     }
     else
     {
@@ -272,13 +273,13 @@ public class Mob
       {
         for(int i=leftColumn; i <= rightColumn; i++)
         {
-          gapArray.add(new Gap(topRow, i, 0));
+          gapArray.add(new Gap(topRow, i, Direction.FACE_UP));
         }
         for(int i=rowIndexRange.begin;
           i <= findLastSameValueIndex(rowIndexRange.begin, Dimension.ROW); i++)
         {
           int thisObsColumn = arrRow[i].getObsColumn();
-          gapArray.removeIf(gap -> gap.matches(finalTopRow, thisObsColumn, 0));
+          gapArray.removeIf(gap -> gap.matches(finalTopRow, thisObsColumn, Direction.FACE_UP));
         }
         if(rowIndexRange.begin >= 1)
         {
@@ -286,7 +287,7 @@ public class Mob
             i <= rowIndexRange.begin - 1; i++)
           {
             int thisObsColumn = arrRow[i].getObsColumn();
-            gapArray.removeIf(gap -> gap.matches(finalTopRow, thisObsColumn, 0));
+            gapArray.removeIf(gap -> gap.matches(finalTopRow, thisObsColumn, Direction.FACE_UP));
           }
         }
       }
@@ -298,13 +299,13 @@ public class Mob
       {
         for(int i=leftColumn; i <= rightColumn; i++)
         {
-          gapArray.add(new Gap(bottomRow, i, 2));
+          gapArray.add(new Gap(bottomRow, i, Direction.FACE_DOWN));
         }
         for(int i=rowIndexRange.end;
           i >= findFirstSameValueIndex(rowIndexRange.end, Dimension.ROW); i--)
         {
           int thisObsColumn = arrRow[i].getObsColumn();
-          gapArray.removeIf(gap -> gap.matches(finalBottomRow, thisObsColumn, 2));
+          gapArray.removeIf(gap -> gap.matches(finalBottomRow, thisObsColumn, Direction.FACE_DOWN));
         }
         if(rowIndexRange.end <= arrRow.length - 2)
         {
@@ -312,7 +313,7 @@ public class Mob
             i >= rowIndexRange.end + 1; i--)
           {
             int thisObsColumn = arrRow[i].getObsColumn();
-            gapArray.removeIf(gap -> gap.matches(finalBottomRow, thisObsColumn, 2));
+            gapArray.removeIf(gap -> gap.matches(finalBottomRow, thisObsColumn, Direction.FACE_DOWN));
           }
         }
       }
@@ -324,13 +325,13 @@ public class Mob
       {
         for(int i=topRow; i <= bottomRow; i++)
         {
-          gapArray.add(new Gap(i, leftColumn, 3));
+          gapArray.add(new Gap(i, leftColumn, Direction.FACE_LEFT));
         }
         for(int i=columnIndexRange.begin;
           i <= findLastSameValueIndex(columnIndexRange.begin, Dimension.COLUMN); i++)
         {
           int thisObsRow = arrColumn[i].getObsRow();
-          gapArray.removeIf(gap -> gap.matches(thisObsRow, finalLeftColumn, 3));
+          gapArray.removeIf(gap -> gap.matches(thisObsRow, finalLeftColumn, Direction.FACE_LEFT));
         }
         if(columnIndexRange.begin >= 1)
         {
@@ -338,7 +339,7 @@ public class Mob
             i <= columnIndexRange.begin - 1; i++)
           {
             int thisObsRow = arrColumn[i].getObsRow();
-            gapArray.removeIf(gap -> gap.matches(thisObsRow, finalLeftColumn, 3));
+            gapArray.removeIf(gap -> gap.matches(thisObsRow, finalLeftColumn, Direction.FACE_LEFT));
           }
         }
       }
@@ -350,13 +351,13 @@ public class Mob
       {
         for(int i=topRow; i <= bottomRow; i++)
         {
-          gapArray.add(new Gap(i, rightColumn, 1));
+          gapArray.add(new Gap(i, rightColumn, Direction.FACE_RIGHT));
         }
         for(int i=columnIndexRange.end;
           i >= findFirstSameValueIndex(columnIndexRange.end, Dimension.COLUMN); i--)
         {
           int thisObsRow = arrColumn[i].getObsRow();
-          gapArray.removeIf(gap -> gap.matches(thisObsRow, finalRightColumn, 1));
+          gapArray.removeIf(gap -> gap.matches(thisObsRow, finalRightColumn, Direction.FACE_RIGHT));
         }
         if(columnIndexRange.end < arrColumn.length - 2)
         {
@@ -364,7 +365,7 @@ public class Mob
             i >= columnIndexRange.end + 1; i--)
           {
             int thisObsRow = arrColumn[i].getObsRow();
-            gapArray.removeIf(gap -> gap.matches(thisObsRow, finalRightColumn, 1));
+            gapArray.removeIf(gap -> gap.matches(thisObsRow, finalRightColumn, Direction.FACE_RIGHT));
           }
         }
       } 
@@ -400,8 +401,9 @@ public class Mob
     
     float targetX = gapArray.get(minIndex).gapColumn * gridSize,
       targetY = gapArray.get(minIndex).gapRow * gridSize;
-    float targetDirection = gapArray.get(minIndex).gapDirection;
-    waypoint = new float[]{targetX, targetY, targetDirection};
+    Direction targetDir = gapArray.get(minIndex).gapDir;
+    
+    waypoint = new Waypoint(targetX, targetY, targetDir);
   }
   
   private void updateAllConditionRanges()

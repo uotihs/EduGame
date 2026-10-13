@@ -2,10 +2,9 @@ import java.util.Arrays;
 import java.lang.IndexOutOfBoundsException;
 import java.util.Comparator;
 
-public enum Dimension
-{
-  ROW, COLUMN
-}
+public enum Dimension { ROW, COLUMN }
+
+public enum Direction { FACE_UP, FACE_DOWN, FACE_LEFT, FACE_RIGHT, CROSSING_GAP }
 
 public class IndexRange
 {
@@ -19,21 +18,47 @@ public class IndexRange
 
 public class Gap
 {
-  public int gapRow=0, gapColumn=0, gapDirection=0;
+  private int gapRow=0, gapColumn=0;
+  private Direction gapDir = Direction.FACE_UP;
   
-  Gap(int inputRow, int inputColumn, int inputDirection)
+  Gap(int inputRow, int inputColumn, Direction inputDir)
   {
     this.gapRow = inputRow;
     this.gapColumn = inputColumn;
-    this.gapDirection = inputDirection;
+    this.gapDir = inputDir;
   }
   
-   public boolean matches(int targetRow, int targetColumn, int targetDirection)
+   public boolean matches(int targetRow, int targetColumn, Direction targetDir)
    {
      return gapRow == targetRow && 
       gapColumn == targetColumn &&
-      gapDirection == targetDirection;
+      gapDir == targetDir;
    }
+   
+   public int getGapRow() { return gapRow; }
+   public int getGapColumn() { return gapColumn; }
+   public Direction getGapDir() { return gapDir; }
+}
+
+public class Waypoint
+{
+  private float waypointX=0, waypointY=0;
+  private Direction waypointDir = Direction.FACE_UP;
+  
+  public Waypoint(float inputX, float inputY, Direction inputDir)
+  {
+    this.waypointX = inputX;
+    this.waypointY = inputY;
+    this.waypointDir = inputDir;
+  }
+  
+  public float getWaypointX() { return waypointX; }
+  public float getWaypointY() { return waypointY; }
+  public Direction getWaypointDir() { return waypointDir; }
+  
+  public void addWaypointX(float deltaX) { this.waypointX += deltaX; }
+  public void addWaypointY(float deltaY) { this.waypointY += deltaY; }
+  public void setWaypointDir(Direction inputDir) { this.waypointDir = inputDir; }
 }
 
 public static <T> T[] appendTo(T[] oldArr, T item)
@@ -80,10 +105,12 @@ public void renderMobs()
   for(Mob thisMob: mobArr)
   {
     thisMob.renderMob();
+    float thisTargetX = thisMob.waypoint.getWaypointX(),
+      thisTargetY = thisMob.waypoint.getWaypointY();
     text("mobX: "+thisMob.getMobX()+" mobY: "+thisMob.getMobY()+" hp: "+thisMob.getMobHealth()
-      +"\nTarget: ("+thisMob.waypoint[0]+", "+thisMob.waypoint[1]+")"
-      +"\nTargetRC: ("+thisMob.waypoint[1]/gridSize+", "+thisMob.waypoint[0]/gridSize+")"
-      +"\nDirection: "+thisMob.waypoint[2], 300, d * 100 + 300);
+      +"\nTarget: ("+thisTargetX+", "+thisTargetY+")"
+      +"\nTargetRC: ("+thisTargetY / gridSize+", "+thisTargetX / gridSize+")"
+      +"\nDirection: "+thisMob.waypoint.getWaypointDir(), 300, d * 100 + 300);
     d += 1;
   }
 }

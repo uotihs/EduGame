@@ -214,7 +214,8 @@ public class Player
   {
     for(Mob thisMob: mobArr)
     {
-      if(!thisMob.isInSameSpace() && thisMob.waypoint[2] != -1)
+      if(!thisMob.isInSameSpace() && 
+        thisMob.waypoint.getWaypointDir() != Direction.CROSSING_GAP)
       {
         thisMob.updateAllConditionRanges();
         thisMob.updateWaypoint();
