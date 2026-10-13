@@ -33,29 +33,29 @@ public class Player
       return; 
     }
     if(nextPlayerY < (getRowValue(rowIndexRange.begin) + 1) * gridSize)
+    {
+      boolean isCollided = false;
+      int last = findLastSameValueIndex(rowIndexRange.begin, Dimension.ROW);
+      for(int i=rowIndexRange.begin; i <= last; i++)
       {
-        boolean isCollided = false;
-        int last = findLastSameValueIndex(rowIndexRange.begin, Dimension.ROW);
-        for(int i=rowIndexRange.begin; i <= last; i++)
+        float thisObsLeftX = arrRow[i].getObsColumn() * gridSize;
+        float thisObsRightX = arrRow[i].getObsColumn() * gridSize + gridSize;
+        if(playerX < thisObsRightX && playerX + playerSize > thisObsLeftX)
         {
-          float thisObsLeftX = arrRow[i].getObsColumn() * gridSize;
-          float thisObsRightX = arrRow[i].getObsColumn() * gridSize + gridSize;
-          if(playerX < thisObsRightX && playerX + playerSize > thisObsLeftX)
-          {
-            isCollided = true;
-            break;
-          }
-        }
-        if(isCollided) { this.playerY = (getRowValue(rowIndexRange.begin) + 1) * gridSize; } 
-        else
-        { 
-          this.playerY = nextPlayerY;
-          updateAllConditionRanges();
-          onPlayerChangedConditionsRange();
+          isCollided = true;
+          break;
         }
       }
-      else { this.playerY = nextPlayerY; }
-      if(nextPlayerY < gridSize) { this.playerY = gridSize; }
+      if(isCollided) { this.playerY = (getRowValue(rowIndexRange.begin) + 1) * gridSize; } 
+      else
+      { 
+        this.playerY = nextPlayerY;
+        updateAllConditionRanges();
+        onPlayerChangedConditionsRange();
+      }
+    }
+    else { this.playerY = nextPlayerY; }
+    if(nextPlayerY < gridSize) { this.playerY = gridSize; }
   }
   public void moveDown() 
   { 
@@ -75,29 +75,29 @@ public class Player
       return; 
     }
     if(nextPlayerY > (getRowValue(rowIndexRange.end) - 1) * gridSize)
+    {
+      boolean isCollided = false;
+      int first = findFirstSameValueIndex(rowIndexRange.end, Dimension.ROW);
+      for(int i=rowIndexRange.end; i >= first; i--)
       {
-        boolean isCollided = false;
-        int first = findFirstSameValueIndex(rowIndexRange.end, Dimension.ROW);
-        for(int i=rowIndexRange.end; i >= first; i--)
+        float thisObsLeftX = arrRow[i].getObsColumn() * gridSize;
+        float thisObsRightX = arrRow[i].getObsColumn() * gridSize + gridSize;
+        if(playerX < thisObsRightX && playerX + playerSize > thisObsLeftX)
         {
-          float thisObsLeftX = arrRow[i].getObsColumn() * gridSize;
-          float thisObsRightX = arrRow[i].getObsColumn() * gridSize + gridSize;
-          if(playerX < thisObsRightX && playerX + playerSize > thisObsLeftX)
-          {
-            isCollided = true;
-            break;
-          }
-        }
-        if(isCollided) { this.playerY = getRowValue(rowIndexRange.end) * gridSize - gridSize; } 
-        else 
-        { 
-          this.playerY = nextPlayerY;
-          updateAllConditionRanges();
-          onPlayerChangedConditionsRange();
+          isCollided = true;
+          break;
         }
       }
-      else { this.playerY = nextPlayerY; }
-      if(nextPlayerY > height - gridSize - playerSize) { this.playerY = height - gridSize - playerSize; }
+      if(isCollided) { this.playerY = getRowValue(rowIndexRange.end) * gridSize - gridSize; } 
+      else 
+      { 
+        this.playerY = nextPlayerY;
+        updateAllConditionRanges();
+        onPlayerChangedConditionsRange();
+      }
+    }
+    else { this.playerY = nextPlayerY; }
+    if(nextPlayerY > height - gridSize - playerSize) { this.playerY = height - gridSize - playerSize; }
   }
   public void moveLeft() 
   { 
@@ -117,29 +117,29 @@ public class Player
       return; 
     }
     if(nextPlayerX < (getColumnValue(columnIndexRange.begin) + 1) * gridSize)
+    {
+      boolean isCollided = false;
+      int last = findLastSameValueIndex(columnIndexRange.begin, Dimension.COLUMN);
+      for(int i=columnIndexRange.begin; i <= last; i++)
       {
-        boolean isCollided = false;
-        int last = findLastSameValueIndex(columnIndexRange.begin, Dimension.COLUMN);
-        for(int i=columnIndexRange.begin; i <= last; i++)
+        float thisObsTopY = arrColumn[i].getObsRow() * gridSize;
+        float thisObsBottomY = arrColumn[i].getObsRow() * gridSize + gridSize;
+        if(playerY < thisObsBottomY && playerY + playerSize > thisObsTopY)
         {
-          float thisObsTopY = arrColumn[i].getObsRow() * gridSize;
-          float thisObsBottomY = arrColumn[i].getObsRow() * gridSize + gridSize;
-          if(playerY < thisObsBottomY && playerY + playerSize > thisObsTopY)
-          {
-            isCollided = true;
-            break;
-          }
-        }
-        if(isCollided) { this.playerX = (getColumnValue(columnIndexRange.begin) + 1) * gridSize; } 
-        else
-        { 
-          this.playerX = nextPlayerX;
-          updateAllConditionRanges();
-          onPlayerChangedConditionsRange();
+          isCollided = true;
+          break;
         }
       }
-      else { this.playerX = nextPlayerX; }
-      if(nextPlayerX < gridSize) { this.playerX = gridSize; }
+      if(isCollided) { this.playerX = (getColumnValue(columnIndexRange.begin) + 1) * gridSize; } 
+      else
+      { 
+        this.playerX = nextPlayerX;
+        updateAllConditionRanges();
+        onPlayerChangedConditionsRange();
+      }
+    }
+    else { this.playerX = nextPlayerX; }
+    if(nextPlayerX < gridSize) { this.playerX = gridSize; }
   }
   public void moveRight() 
   { 
@@ -156,32 +156,32 @@ public class Player
     if(arrColumn.length == 0 || columnIndexRange.end == -1)
     {
       this.playerX = Math.min(width - gridSize - playerSize, nextPlayerX);
-      return; 
+      return;
     }
     if(nextPlayerX > (getColumnValue(columnIndexRange.end) - 1) * gridSize)
+    {
+      boolean isCollided = false;
+      int first = findFirstSameValueIndex(columnIndexRange.end, Dimension.COLUMN);
+      for(int i=columnIndexRange.end; i >= first; i--)
       {
-        boolean isCollided = false;
-        int first = findFirstSameValueIndex(columnIndexRange.end, Dimension.COLUMN);
-        for(int i=columnIndexRange.end; i >= first; i--)
+        float thisObsTopY = arrColumn[i].getObsRow() * gridSize;
+        float thisObsBottomY = arrColumn[i].getObsRow() * gridSize + gridSize;
+        if(playerY < thisObsBottomY && playerY + playerSize > thisObsTopY)
         {
-          float thisObsTopY = arrColumn[i].getObsRow() * gridSize;
-          float thisObsBottomY = arrColumn[i].getObsRow() * gridSize + gridSize;
-          if(playerY < thisObsBottomY && playerY + playerSize > thisObsTopY)
-          {
-            isCollided = true;
-            break;
-          }
-        }
-        if(isCollided) { this.playerX = getColumnValue(columnIndexRange.end) * gridSize - gridSize; } 
-        else
-        { 
-          this.playerX = nextPlayerX;
-          updateAllConditionRanges();
-          onPlayerChangedConditionsRange();
+          isCollided = true;
+          break;
         }
       }
-      else { this.playerX = nextPlayerX; }
-      if(nextPlayerX > width - gridSize - playerSize) { this.playerX = width - gridSize - playerSize; }
+      if(isCollided) { this.playerX = getColumnValue(columnIndexRange.end) * gridSize - gridSize; } 
+      else
+      { 
+        this.playerX = nextPlayerX;
+        updateAllConditionRanges();
+        onPlayerChangedConditionsRange();
+      }
+    }
+    else { this.playerX = nextPlayerX; }
+    if(nextPlayerX > width - gridSize - playerSize) { this.playerX = width - gridSize - playerSize; }
   }
   
   private void updateAllConditionRanges()
@@ -214,7 +214,8 @@ public class Player
   {
     for(Mob thisMob: mobArr)
     {
-      if(!thisMob.isInSameSpace() && thisMob.waypoint[2] != -1)
+      if(!thisMob.isInSameSpace() && 
+        thisMob.waypoint.getWaypointDir() != Direction.CROSSING_GAP)
       {
         thisMob.updateAllConditionRanges();
         thisMob.updateWaypoint();

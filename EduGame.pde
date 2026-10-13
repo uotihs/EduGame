@@ -8,7 +8,7 @@ float gridSize;
 int currentRow = 2, currentColumn = 2;
 ObstacleData[] arrRow, arrColumn;
 Player player;
-Mob[] mobArr;
+ArrayList<Mob> mobArr;
 
 PImage backgroundImage;
 PImage[] tiles = new PImage[11];
