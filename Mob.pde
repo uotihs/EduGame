@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 
 public class Mob
 {
@@ -21,7 +20,7 @@ public class Mob
 
   private void move()
   {
-    if(isInSameSpace())
+    if(canSeePlayer())
     {
       float minDistance = gridSize * 2;
       float distance = dist(mobX, mobY, player.getPlayerX(), player.getPlayerY());
@@ -32,6 +31,97 @@ public class Mob
     {
       walkTowardWaypoint();
     }
+  }
+  
+  private boolean canSeePlayer()
+  {
+    float mobCenterX = mobX + mobSize / 2,
+      mobCenterY = mobY + mobSize / 2,
+      playerCenterX = player.getPlayerX() + player.getPlayerSize() / 2,
+      playerCenterY = player.getPlayerY() + player.getPlayerSize() / 2;
+      
+    int currentColumn = (int)(mobCenterX / gridSize),
+      currentRow = (int)(mobCenterY / gridSize),
+      endColumn = (int)(playerCenterX / gridSize),
+      endRow = (int)(playerCenterY / gridSize);
+    if(currentRow == endRow && currentColumn == endColumn) { return true; }
+    if(isObstacle(currentRow, currentColumn)) { return false; }
+      
+    float deltaX = playerCenterX - mobCenterX,
+      deltaY = playerCenterY - mobCenterY;
+      
+    int stepRow, stepColumn;
+    float nextXBoundary, nextYBoundary;
+    if(deltaX > 0)
+    { 
+      stepColumn = 1;
+      nextXBoundary = (currentColumn + 1) * gridSize;
+    }
+    else
+    {
+      stepColumn = -1;
+      nextXBoundary = currentColumn * gridSize;
+    }
+    if(deltaY > 0)
+    {
+      stepRow = 1;
+      nextYBoundary = (currentRow + 1) * gridSize;
+    }
+    else
+    {
+      stepRow = -1;
+      nextYBoundary = currentRow * gridSize;
+    }
+    
+    float tX, tY, tTotalX, tTotalY;
+    if(deltaX != 0)
+    {
+      tX = abs(gridSize / deltaX);
+      tTotalX = abs((nextXBoundary - mobCenterX) / deltaX);
+    }
+    else
+    {
+      tX = Float.POSITIVE_INFINITY;
+      tTotalX = Float.POSITIVE_INFINITY;
+    }
+    if(deltaY != 0)
+    {
+      tY = abs(gridSize / deltaY);
+      tTotalY = abs((nextYBoundary - mobCenterY) / deltaY);
+    }
+    else
+    {
+      tY = Float.POSITIVE_INFINITY;
+      tTotalY = Float.POSITIVE_INFINITY;
+    }
+  
+    while(currentRow != endRow || currentColumn != endColumn)
+    {
+      if(tTotalX < tTotalY)
+      {
+        currentColumn += stepColumn;
+        tTotalX += tX;
+      }
+      else if(tTotalX > tTotalY)
+      {
+        currentRow += stepRow;
+        tTotalY += tY;
+      }
+      else
+      {
+        if(isObstacle(currentRow + stepRow, currentColumn) ||
+          isObstacle(currentRow, currentColumn + stepColumn))
+        {
+          return false;
+        }
+        currentRow += stepRow;
+        currentColumn += stepColumn;
+        tTotalX += tX;
+        tTotalY += tY;
+      }
+      if(isObstacle(currentRow, currentColumn)) { return false; }
+    }
+    return true;
   }
   
   private void chasePlayer()
@@ -53,7 +143,10 @@ public class Mob
     float distanceToWaypoint = dist(thisWaypointX, thisWaypointY, mobX, mobY);
     //float distanceToPlayer = dist(player.playerX, player.playerY, mobX, mobY);
     if(distanceToWaypoint < speed)
-    {
+    {  
+      this.mobX = thisWaypointX;
+      this.mobY = thisWaypointY;
+      updateAllConditionRanges();
       if(waypoint.getWaypointDir() != Direction.CROSSING_GAP)
       {
         Direction thisDir = waypoint.getWaypointDir();
@@ -62,15 +155,11 @@ public class Mob
         else if(thisDir == Direction.FACE_LEFT) { waypoint.addWaypointX(gridSize * -1); }
         else if(thisDir == Direction.FACE_RIGHT) { waypoint.addWaypointX(gridSize); }
         else { throw new IllegalArgumentException("Invalid direction: "+thisDir+".");}
-        updateAllConditionRanges();
         waypoint.setWaypointDir(Direction.CROSSING_GAP);
         return;
       }
       else
       {
-        this.mobX = thisWaypointX;
-        this.mobY = thisWaypointY;
-        updateAllConditionRanges();
         updateWaypoint();
         return;
       }
@@ -85,12 +174,12 @@ public class Mob
     
     if(distanceToTarget == 0) { return; }
     
-    float stepX = speed * (deltaX / distanceToTarget),
-      stepY = speed * (deltaY / distanceToTarget);
-    
+    float stepX = deltaX / distanceToTarget,
+      stepY = deltaY / distanceToTarget;
+      
     boolean verticalCollide = isVerticalCollided(stepY),
       horizontalCollide = isHorizontalCollided(stepX);
-    
+      
     if(verticalCollide && horizontalCollide)
     {
       //updateWaypoint();
@@ -106,7 +195,7 @@ public class Mob
         updateWaypoint();
       }
       else
-      { this.mobX += stepX; }
+      { this.mobX += speed * Math.signum(stepX); }
     }
     else if(!verticalCollide && horizontalCollide)
     {
@@ -117,7 +206,7 @@ public class Mob
         updateWaypoint();
       }
       else
-      { this.mobY += stepY; } 
+      { this.mobY += speed * Math.signum(stepY); } 
     }
     else
     {
@@ -140,10 +229,10 @@ public class Mob
   private boolean isVerticalCollided(float stepY)
   {
     float nextY = mobY + stepY;
-    boolean isCollided = false;
     if(stepY < 0)
     {
       //check topRow obstacles
+      /*
       if(arrRow.length == 0 || rowIndexRange.begin == -1)
       {
         return nextY < gridSize;
@@ -163,10 +252,18 @@ public class Mob
         }
       }
       if(nextY < gridSize) { isCollided = true; }
+      */
+      int nextRow = (int)(nextY / gridSize),
+        leftColumn = (int)(mobX / gridSize),
+        rightColumn = (int)((mobX + mobSize - 1) / gridSize);
+      if(!isObstacle(nextRow, leftColumn) &&
+        !isObstacle(nextRow, rightColumn)) { return false; }
+      else { return true; }
     }
     else
     {
       //check bottomRow obstacles
+      /*
       if(arrRow.length == 0 || rowIndexRange.end == -1)
       {
         return nextY > height - gridSize - mobSize ;
@@ -186,17 +283,23 @@ public class Mob
         }
       }
       if(nextY > height - gridSize - mobSize) { isCollided = true; }
+      */
+      int nextRow = (int)((nextY + mobSize) / gridSize),
+        leftColumn = (int)(mobX / gridSize),
+        rightColumn = (int)((mobX + mobSize - 1) / gridSize);
+      if(!isObstacle(nextRow, leftColumn) &&
+        !isObstacle(nextRow, rightColumn)) { return false; }
+      else { return true; }
     }
-    return isCollided;
   }
   
   private boolean isHorizontalCollided(float stepX)
   {
     float nextX = mobX + stepX;
-    boolean isCollided = false;
     if(stepX < 0)
     {
       //check leftColumn obstacles
+      /*
       if(arrColumn.length == 0 || columnIndexRange.begin == -1)
       {
         return nextX < gridSize;
@@ -216,9 +319,17 @@ public class Mob
         }
       }
       if(nextX < gridSize) { isCollided = true; }
+      */
+      int nextColumn = (int)(nextX / gridSize),
+        topRow = (int)(mobY / gridSize),
+        bottomRow = (int)((mobY + mobSize - 1) / gridSize);
+      if(!isObstacle(topRow, nextColumn) &&
+        !isObstacle(bottomRow, nextColumn)) { return false; }
+      else { return true; }
     }
     else
     {
+      /*
       if(arrColumn.length == 0 || columnIndexRange.end == -1)
       {
         return nextX > width - gridSize - mobSize;
@@ -238,8 +349,14 @@ public class Mob
         }
       }
       if(nextX > width - gridSize - mobSize) { isCollided = true; }
+      */
+      int nextColumn = (int)((nextX + mobSize) / gridSize),
+        topRow = (int)(mobY / gridSize),
+        bottomRow = (int)((mobY + mobSize - 1) / gridSize);
+      if(!isObstacle(topRow, nextColumn) &&
+        !isObstacle(bottomRow, nextColumn)) { return false; }
+      else { return true; }
     }
-    return isCollided;
   }
   
   private ArrayList<Gap> getGapArray()
@@ -424,14 +541,6 @@ public class Mob
     IndexRange newColumnConditionRange = getColumnConditionRange(mobX);
     columnIndexRange.begin = newColumnConditionRange.begin;
     columnIndexRange.end = newColumnConditionRange.end;
-  }
-  
-  private boolean isInSameSpace()
-  {
-     return (rowIndexRange.begin == player.getRowIndexRange().begin &&
-       rowIndexRange.end == player.getRowIndexRange().end &&
-       columnIndexRange.begin == player.getColumnIndexRange().begin &&
-       columnIndexRange.end == player.getColumnIndexRange().end);
   }
 
   public void renderMob()

@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.lang.IndexOutOfBoundsException;
 import java.util.Comparator;
 
@@ -66,6 +67,26 @@ public static <T> T[] appendTo(T[] oldArr, T item)
   T[] newArr = Arrays.copyOf(oldArr, oldArr.length + 1);
   newArr[newArr.length-1] = item;
   return newArr;
+}
+
+public void updateObsArr()
+{
+  // rows * columns
+  // remember this bool arr has conflict with old storing method.
+  obsArr = new boolean[rows * columns];
+  for(ObstacleData obs : obsData[currentRow][currentColumn])
+  {
+    obsArr[(obs.getObsRow() - 1) * columns + obs.getObsColumn() - 1] = true; 
+  }
+}
+
+public boolean isObstacle(int thisRow, int thisColumn)
+{
+  thisRow -= 1;
+  thisColumn -= 1;
+  if(thisRow < 0 || thisRow > rows - 1 ||
+    thisColumn < 0 || thisColumn > columns - 1) { return true; }
+  else { return obsArr[thisRow * columns + thisColumn]; }
 }
 
 public void updateMobsArray()
@@ -281,8 +302,6 @@ public void tmpDisplayRoomInformation()
         ", Column: "+ thisObs.getObsColumn() +
         ", Type: "+ thisObs.getObsType(), 430, 150+i*25); 
   }
-  text("Row: "+player.getBeginRow()+"~"+player.getEndRow()+"\n"
-    +"Column: "+player.getBeginColumn()+"~"+player.getEndColumn(), 200, 650);
 }
 
 public boolean hasTopRoom()
@@ -320,11 +339,24 @@ public boolean hasRightRoom()
 public void renderBackground()
 {
   image(backgroundImage, 0, 0, width, height);
-  
-  if(hasTopRoom()) { image(tiles[0], gridSize * 5, 0, gridSize, gridSize); }
-  if(hasBottomRoom()) { image(tiles[2], gridSize * 5, height - gridSize, gridSize, gridSize); }
-  if(hasLeftRoom()) { image(tiles[4], 0, gridSize * 4, gridSize, gridSize); }
-  if(hasRightRoom()) { image(tiles[6], width - gridSize, gridSize * 4, gridSize, gridSize); }
+}
+
+public void renderDoors()
+{
+  if(mobArr.isEmpty())
+  {
+    if(hasTopRoom()) {image(tiles[1], gridSize * 5, 0, gridSize, gridSize); }
+    if(hasBottomRoom()) { image(tiles[3], gridSize * 5, height - gridSize, gridSize, gridSize); }
+    if(hasLeftRoom()) { image(tiles[5], 0, gridSize * 4, gridSize, gridSize); }
+    if(hasRightRoom()) { image(tiles[7], width - gridSize, gridSize * 4, gridSize, gridSize); } 
+  }
+  else
+  {
+    if(hasTopRoom()) {image(tiles[0], gridSize * 5, 0, gridSize, gridSize); }
+    if(hasBottomRoom()) { image(tiles[2], gridSize * 5, height - gridSize, gridSize, gridSize); }
+    if(hasLeftRoom()) { image(tiles[4], 0, gridSize * 4, gridSize, gridSize); }
+    if(hasRightRoom()) { image(tiles[6], width - gridSize, gridSize * 4, gridSize, gridSize); }
+  }
 }
 
 public void renderObstacles()
@@ -342,89 +374,37 @@ public void renderObstacles()
 
 public void enterTopPortal()
 {
-  fill(#FFFFFF);
-  textSize(50);
-  try
-  {
-    if(roomDisData[currentRow - 1][currentColumn] == -1)
-    { 
-      text("Top room doesn't exist.", 120, 400); 
-    }
-    else
-    {
-      currentRow -= 1;
-      updateObstaclesArray();
-      updateMobsArray();
-    }
-  }
-  catch(IndexOutOfBoundsException e)
-  {
-    text("Top room doesn't exist.", 120, 400);
+  if(hasTopRoom())
+  { 
+    currentRow -= 1;
+    updateObstaclesArray();
+    updateMobsArray();
   }
 }
 public void enterBottomPortal()
 {
-  fill(#FFFFFF);
-  textSize(50);
-  try
-  {
-    if(roomDisData[currentRow + 1][currentColumn] == -1) 
-    { 
-      text("Bottom room doesn't exist.", 120, 400); 
-    }
-    else
-    {
-      currentRow += 1;
-      updateObstaclesArray();
-      updateMobsArray();
-    }
-  }
-  catch(IndexOutOfBoundsException e)
-  {
-    text("Bottom room doesn't exist.", 120, 400);
+  if(hasBottomRoom())
+  { 
+    currentRow += 1;
+    updateObstaclesArray();
+    updateMobsArray();
   }
 }
 public void enterLeftPortal()
 {
-  fill(#FFFFFF);
-  textSize(50);
-  try
-  {
-    if(roomDisData[currentRow][currentColumn - 1] == -1)
-    { 
-      text("Left room doesn't exist.", 120, 400); 
-    }
-    else
-    {
-      currentColumn -= 1;
-      updateObstaclesArray();
-      updateMobsArray();
-    }
-  }
-  catch(IndexOutOfBoundsException e)
-  {
-    text("Left room doesn't exist.", 120, 400);
+  if(hasLeftRoom())
+  { 
+    currentColumn -= 1;
+    updateObstaclesArray();
+    updateMobsArray();
   }
 }
 public void enterRightPortal()
 {
-  fill(#FFFFFF);
-  textSize(50);
-  try
-  {
-    if(roomDisData[currentRow][currentColumn + 1] == -1)
-    { 
-      text("Right room doesn't exist.", 120, 400); 
-    }
-    else
-    {
-      currentColumn += 1;
-      updateObstaclesArray();
-      updateMobsArray();
-    }
-  }
-  catch(IndexOutOfBoundsException e)
-  {
-    text("Right room doesn't exist.", 120, 400);
+  if(hasRightRoom())
+  { 
+    currentColumn += 1;
+    updateObstaclesArray();
+    updateMobsArray();
   }
 }

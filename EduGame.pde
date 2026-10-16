@@ -4,6 +4,9 @@ int[][] roomDisData;
 MobData[][][] mobData;
 ObstacleData[][][] obsData;
 
+boolean[] obsArr;
+int rows = 7, columns = 9;
+
 float gridSize;
 int currentRow = 2, currentColumn = 2;
 ObstacleData[] arrRow, arrColumn;
@@ -17,7 +20,7 @@ void setup()
 {
   saver = new SaveManager();
   // below line will reset whole data, can only use once after refactor!!!
-  // saver.initializeData();
+  //saver.initializeData();
   
   mapData = saver.loadFromData();
   roomDisData = mapData.roomDistData;
@@ -25,6 +28,7 @@ void setup()
   obsData = mapData.obsData;
   saver.saveIntoData(mapData);
   
+  updateObsArr();
   updateObstaclesArray();
   updateMobsArray();
 
@@ -37,14 +41,15 @@ void setup()
 
   player = new Player();
   
-  //mobData[2][1] = appendTo(mobData[2][1], new MobData(5, 6));
+  mobData[2][3] = appendTo(mobData[2][3], new MobData(4, 8));
   //obsData[2][1] = appendTo(obsData[2][1], new ObstacleData(8, 5, 0));
-  //saver.saveIntoData(mapData);
+  saver.saveIntoData(mapData);
 }
 
 void draw()
 {
   renderBackground();
+  renderDoors();
   player.renderPlayer();
   renderObstacles();
   clearDeadMobs();
