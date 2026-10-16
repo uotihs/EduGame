@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.lang.IndexOutOfBoundsException;
 import java.util.Comparator;
 
@@ -66,6 +67,26 @@ public static <T> T[] appendTo(T[] oldArr, T item)
   T[] newArr = Arrays.copyOf(oldArr, oldArr.length + 1);
   newArr[newArr.length-1] = item;
   return newArr;
+}
+
+public void updateObsArr()
+{
+  // rows * columns
+  // remember this bool arr has conflict with old storing method.
+  obsArr = new boolean[rows * columns];
+  for(ObstacleData obs : obsData[currentRow][currentColumn])
+  {
+    obsArr[(obs.getObsRow() - 1) * columns + obs.getObsColumn() - 1] = true; 
+  }
+}
+
+public boolean isObstacle(int thisRow, int thisColumn)
+{
+  thisRow -= 1;
+  thisColumn -= 1;
+  if(thisRow < 0 || thisRow > rows - 1 ||
+    thisColumn < 0 || thisColumn > columns - 1) { return true; }
+  else { return obsArr[thisRow * columns + thisColumn]; }
 }
 
 public void updateMobsArray()
@@ -281,8 +302,6 @@ public void tmpDisplayRoomInformation()
         ", Column: "+ thisObs.getObsColumn() +
         ", Type: "+ thisObs.getObsType(), 430, 150+i*25); 
   }
-  text("Row: "+player.getBeginRow()+"~"+player.getEndRow()+"\n"
-    +"Column: "+player.getBeginColumn()+"~"+player.getEndColumn(), 200, 650);
 }
 
 public boolean hasTopRoom()

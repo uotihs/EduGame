@@ -4,6 +4,9 @@ int[][] roomDisData;
 MobData[][][] mobData;
 ObstacleData[][][] obsData;
 
+boolean[] obsArr;
+int rows = 7, columns = 9;
+
 float gridSize;
 int currentRow = 2, currentColumn = 2;
 ObstacleData[] arrRow, arrColumn;
@@ -17,7 +20,7 @@ void setup()
 {
   saver = new SaveManager();
   // below line will reset whole data, can only use once after refactor!!!
-  // saver.initializeData();
+  //saver.initializeData();
   
   mapData = saver.loadFromData();
   roomDisData = mapData.roomDistData;
@@ -25,6 +28,7 @@ void setup()
   obsData = mapData.obsData;
   saver.saveIntoData(mapData);
   
+  updateObsArr();
   updateObstaclesArray();
   updateMobsArray();
 
