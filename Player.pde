@@ -18,7 +18,8 @@ public class Player
   public void moveUp()
   { 
     float nextPlayerY = playerY - speed;
-    if(isTouchingPoint(width / 2, gridSize * 1.5) && hasTopRoom())
+    if(isTouchingPoint(width / 2, gridSize * 1.5) &&
+      hasTopRoom() && mobArr.isEmpty())
     { 
       enterTopPortal();
       this.playerX = width / 2 - playerSize / 2;
@@ -60,7 +61,8 @@ public class Player
   public void moveDown() 
   { 
     float nextPlayerY = playerY + speed;
-    if(isTouchingPoint(width / 2, height - gridSize * 1.5) && hasBottomRoom())
+    if(isTouchingPoint(width / 2, height - gridSize * 1.5) &&
+      hasBottomRoom() && mobArr.isEmpty())
     { 
       enterBottomPortal();
       this.playerX = width / 2 - playerSize / 2;
@@ -102,7 +104,8 @@ public class Player
   public void moveLeft() 
   { 
     float nextPlayerX = playerX - speed;
-    if(isTouchingPoint(gridSize * 1.5, height / 2) && hasLeftRoom())
+    if(isTouchingPoint(gridSize * 1.5, height / 2) &&
+      hasLeftRoom() && mobArr.isEmpty())
     { 
       enterLeftPortal();
       this.playerX = width - gridSize - playerSize;
@@ -144,7 +147,8 @@ public class Player
   public void moveRight() 
   { 
     float nextPlayerX = playerX + speed;
-    if(isTouchingPoint(width - gridSize * 1.5, height / 2) && hasRightRoom())
+    if(isTouchingPoint(width - gridSize * 1.5, height / 2) &&
+      hasRightRoom() && mobArr.isEmpty())
     { 
       enterRightPortal();
       this.playerX = gridSize * 1;

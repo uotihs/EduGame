@@ -53,7 +53,10 @@ public class Mob
     float distanceToWaypoint = dist(thisWaypointX, thisWaypointY, mobX, mobY);
     //float distanceToPlayer = dist(player.playerX, player.playerY, mobX, mobY);
     if(distanceToWaypoint < speed)
-    {
+    {  
+      this.mobX = thisWaypointX;
+      this.mobY = thisWaypointY;
+      updateAllConditionRanges();
       if(waypoint.getWaypointDir() != Direction.CROSSING_GAP)
       {
         Direction thisDir = waypoint.getWaypointDir();
@@ -62,15 +65,11 @@ public class Mob
         else if(thisDir == Direction.FACE_LEFT) { waypoint.addWaypointX(gridSize * -1); }
         else if(thisDir == Direction.FACE_RIGHT) { waypoint.addWaypointX(gridSize); }
         else { throw new IllegalArgumentException("Invalid direction: "+thisDir+".");}
-        updateAllConditionRanges();
         waypoint.setWaypointDir(Direction.CROSSING_GAP);
         return;
       }
       else
       {
-        this.mobX = thisWaypointX;
-        this.mobY = thisWaypointY;
-        updateAllConditionRanges();
         updateWaypoint();
         return;
       }
@@ -106,7 +105,7 @@ public class Mob
         updateWaypoint();
       }
       else
-      { this.mobX += stepX; }
+      { this.mobX += speed * Math.signum(stepX); }
     }
     else if(!verticalCollide && horizontalCollide)
     {
@@ -117,7 +116,7 @@ public class Mob
         updateWaypoint();
       }
       else
-      { this.mobY += stepY; } 
+      { this.mobY += speed * Math.signum(stepY); } 
     }
     else
     {

@@ -320,11 +320,24 @@ public boolean hasRightRoom()
 public void renderBackground()
 {
   image(backgroundImage, 0, 0, width, height);
-  
-  if(hasTopRoom()) { image(tiles[0], gridSize * 5, 0, gridSize, gridSize); }
-  if(hasBottomRoom()) { image(tiles[2], gridSize * 5, height - gridSize, gridSize, gridSize); }
-  if(hasLeftRoom()) { image(tiles[4], 0, gridSize * 4, gridSize, gridSize); }
-  if(hasRightRoom()) { image(tiles[6], width - gridSize, gridSize * 4, gridSize, gridSize); }
+}
+
+public void renderDoors()
+{
+  if(mobArr.isEmpty())
+  {
+    if(hasTopRoom()) {image(tiles[1], gridSize * 5, 0, gridSize, gridSize); }
+    if(hasBottomRoom()) { image(tiles[3], gridSize * 5, height - gridSize, gridSize, gridSize); }
+    if(hasLeftRoom()) { image(tiles[5], 0, gridSize * 4, gridSize, gridSize); }
+    if(hasRightRoom()) { image(tiles[7], width - gridSize, gridSize * 4, gridSize, gridSize); } 
+  }
+  else
+  {
+    if(hasTopRoom()) {image(tiles[0], gridSize * 5, 0, gridSize, gridSize); }
+    if(hasBottomRoom()) { image(tiles[2], gridSize * 5, height - gridSize, gridSize, gridSize); }
+    if(hasLeftRoom()) { image(tiles[4], 0, gridSize * 4, gridSize, gridSize); }
+    if(hasRightRoom()) { image(tiles[6], width - gridSize, gridSize * 4, gridSize, gridSize); }
+  }
 }
 
 public void renderObstacles()
@@ -342,89 +355,37 @@ public void renderObstacles()
 
 public void enterTopPortal()
 {
-  fill(#FFFFFF);
-  textSize(50);
-  try
-  {
-    if(roomDisData[currentRow - 1][currentColumn] == -1)
-    { 
-      text("Top room doesn't exist.", 120, 400); 
-    }
-    else
-    {
-      currentRow -= 1;
-      updateObstaclesArray();
-      updateMobsArray();
-    }
-  }
-  catch(IndexOutOfBoundsException e)
-  {
-    text("Top room doesn't exist.", 120, 400);
+  if(hasTopRoom())
+  { 
+    currentRow -= 1;
+    updateObstaclesArray();
+    updateMobsArray();
   }
 }
 public void enterBottomPortal()
 {
-  fill(#FFFFFF);
-  textSize(50);
-  try
-  {
-    if(roomDisData[currentRow + 1][currentColumn] == -1) 
-    { 
-      text("Bottom room doesn't exist.", 120, 400); 
-    }
-    else
-    {
-      currentRow += 1;
-      updateObstaclesArray();
-      updateMobsArray();
-    }
-  }
-  catch(IndexOutOfBoundsException e)
-  {
-    text("Bottom room doesn't exist.", 120, 400);
+  if(hasBottomRoom())
+  { 
+    currentRow += 1;
+    updateObstaclesArray();
+    updateMobsArray();
   }
 }
 public void enterLeftPortal()
 {
-  fill(#FFFFFF);
-  textSize(50);
-  try
-  {
-    if(roomDisData[currentRow][currentColumn - 1] == -1)
-    { 
-      text("Left room doesn't exist.", 120, 400); 
-    }
-    else
-    {
-      currentColumn -= 1;
-      updateObstaclesArray();
-      updateMobsArray();
-    }
-  }
-  catch(IndexOutOfBoundsException e)
-  {
-    text("Left room doesn't exist.", 120, 400);
+  if(hasLeftRoom())
+  { 
+    currentColumn -= 1;
+    updateObstaclesArray();
+    updateMobsArray();
   }
 }
 public void enterRightPortal()
 {
-  fill(#FFFFFF);
-  textSize(50);
-  try
-  {
-    if(roomDisData[currentRow][currentColumn + 1] == -1)
-    { 
-      text("Right room doesn't exist.", 120, 400); 
-    }
-    else
-    {
-      currentColumn += 1;
-      updateObstaclesArray();
-      updateMobsArray();
-    }
-  }
-  catch(IndexOutOfBoundsException e)
-  {
-    text("Right room doesn't exist.", 120, 400);
+  if(hasRightRoom())
+  { 
+    currentColumn += 1;
+    updateObstaclesArray();
+    updateMobsArray();
   }
 }

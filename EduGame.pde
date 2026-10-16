@@ -37,14 +37,15 @@ void setup()
 
   player = new Player();
   
-  //mobData[2][1] = appendTo(mobData[2][1], new MobData(5, 6));
+  mobData[2][3] = appendTo(mobData[2][3], new MobData(4, 8));
   //obsData[2][1] = appendTo(obsData[2][1], new ObstacleData(8, 5, 0));
-  //saver.saveIntoData(mapData);
+  saver.saveIntoData(mapData);
 }
 
 void draw()
 {
   renderBackground();
+  renderDoors();
   player.renderPlayer();
   renderObstacles();
   clearDeadMobs();
