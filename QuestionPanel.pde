@@ -10,7 +10,7 @@ usage:
 
 4. in draw()    =   if(q1.DetectAns() == 1) {do sth}    // it means the first button be clicked , if ==0 : no click
 
-5. after detect -> delete the q1
+5. after detect -> delete the q1 by your self
 
 */
 
@@ -127,7 +127,7 @@ public class Question
     fill(255);
     textSize(30);
     textAlign(CENTER, CENTER);
-    text(this.questionText,this.width/2,this.height/2+this.height/9*2);
+    text(this.questionText,this.width/2,this.height/2+this.height/7);
     
   }
   
@@ -143,22 +143,22 @@ public class Question
 }
 
 
-//Question test;
+// Question test;
 
-//void setup()
-//{
+// void setup()
+// {
 //  size(800,600);
-//  test = new Question("test","ans1","ans2","ans3");
+//  test = new Question("how to answer lim 0/0 questions","L'Hospital","L'Hopital","Locust",width,height);
   
   
-//}
+// }
 
 
-//void draw()
-//{
+// void draw()
+// {
   
 //  test.Draw(50,50,50);
 //  if(test.DetectAns()!= 0)
 //  {}
   
-//}
+// }
