@@ -1,12 +1,17 @@
+import java.util.Queue;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Collections;
+import java.util.ArrayDeque;
 
 public class Mob
 {
   private float mobX=0, mobY=0, mobSize=0;
-  private float speed=1;
-  private Waypoint waypoint = new Waypoint(0, 0, Direction.FACE_UP);
+  private float speed=2;
   private int mobType=0, mobHealth=0;
-  private IndexRange rowIndexRange = new IndexRange(0, 0);
-  private IndexRange columnIndexRange = new IndexRange(0, 0);
+  private ArrayList<int[]> path = new ArrayList<>(),
+    originalPath = new ArrayList<>();
+  private boolean preCanSee = true;
 
   public Mob(MobData mobdata)
   {
@@ -14,14 +19,14 @@ public class Mob
     this.mobY = mobdata.getMobRow() * gridSize;
     this.mobHealth = mobdata.getMobHealth();
     this.mobSize = gridSize;
-    updateAllConditionRanges();
-    updateWaypoint();
+    updatePath();
   }
 
   private void move()
   {
     if(canSeePlayer())
     {
+      preCanSee = true;
       float minDistance = gridSize * 2;
       float distance = dist(mobX, mobY, player.getPlayerX(), player.getPlayerY());
       if(distance > minDistance) { chasePlayer(); }
@@ -29,26 +34,36 @@ public class Mob
     }
     else
     {
+      if(preCanSee == true)
+      {
+        resetPath();
+        preCanSee = false;
+      }
       walkTowardWaypoint();
     }
   }
   
   private boolean canSeePlayer()
   {
-    float mobCenterX = mobX + mobSize / 2,
-      mobCenterY = mobY + mobSize / 2,
-      playerCenterX = player.getPlayerX() + player.getPlayerSize() / 2,
-      playerCenterY = player.getPlayerY() + player.getPlayerSize() / 2;
+    return LoS(mobX, mobY, player.getPlayerX(), player.getPlayerY());
+  }
+  
+  private boolean LoS(float startX, float startY, float endX, float endY)
+  {
+    float startCX = startX + gridSize / 2,
+      startCY = startY + gridSize / 2,
+      endCX = endX + gridSize / 2,
+      endCY = endY + gridSize / 2;
       
-    int currentColumn = (int)(mobCenterX / gridSize),
-      currentRow = (int)(mobCenterY / gridSize),
-      endColumn = (int)(playerCenterX / gridSize),
-      endRow = (int)(playerCenterY / gridSize);
+    int currentColumn = (int)(startCX / gridSize),
+      currentRow = (int)(startCY / gridSize),
+      endColumn = (int)(endCX / gridSize),
+      endRow = (int)(endCY / gridSize);
     if(currentRow == endRow && currentColumn == endColumn) { return true; }
     if(isObstacle(currentRow, currentColumn)) { return false; }
       
-    float deltaX = playerCenterX - mobCenterX,
-      deltaY = playerCenterY - mobCenterY;
+    float deltaX = endCX - startCX,
+      deltaY = endCY - startCY;
       
     int stepRow, stepColumn;
     float nextXBoundary, nextYBoundary;
@@ -77,7 +92,7 @@ public class Mob
     if(deltaX != 0)
     {
       tX = abs(gridSize / deltaX);
-      tTotalX = abs((nextXBoundary - mobCenterX) / deltaX);
+      tTotalX = abs((nextXBoundary - startCX) / deltaX);
     }
     else
     {
@@ -87,7 +102,7 @@ public class Mob
     if(deltaY != 0)
     {
       tY = abs(gridSize / deltaY);
-      tTotalY = abs((nextYBoundary - mobCenterY) / deltaY);
+      tTotalY = abs((nextYBoundary - startCY) / deltaY);
     }
     else
     {
@@ -136,33 +151,17 @@ public class Mob
   }
   
   private void walkTowardWaypoint()
-  {
-    float thisWaypointX = waypoint.getWaypointX(),
-      thisWaypointY = waypoint.getWaypointY();
+  { 
+    int[] curWaypoint = path.get(0);
+    float thisWaypointX = (curWaypoint[1] + 1) * gridSize,
+      thisWaypointY = (curWaypoint[0] + 1) * gridSize;
       
     float distanceToWaypoint = dist(thisWaypointX, thisWaypointY, mobX, mobY);
-    //float distanceToPlayer = dist(player.playerX, player.playerY, mobX, mobY);
     if(distanceToWaypoint < speed)
     {  
       this.mobX = thisWaypointX;
       this.mobY = thisWaypointY;
-      updateAllConditionRanges();
-      if(waypoint.getWaypointDir() != Direction.CROSSING_GAP)
-      {
-        Direction thisDir = waypoint.getWaypointDir();
-        if(thisDir == Direction.FACE_UP) { waypoint.addWaypointY(gridSize * -1); }
-        else if(thisDir == Direction.FACE_DOWN) { waypoint.addWaypointY(gridSize); }
-        else if(thisDir == Direction.FACE_LEFT) { waypoint.addWaypointX(gridSize * -1); }
-        else if(thisDir == Direction.FACE_RIGHT) { waypoint.addWaypointX(gridSize); }
-        else { throw new IllegalArgumentException("Invalid direction: "+thisDir+".");}
-        waypoint.setWaypointDir(Direction.CROSSING_GAP);
-        return;
-      }
-      else
-      {
-        updateWaypoint();
-        return;
-      }
+      updatePath();
     }
     walkTowardTo(thisWaypointX, thisWaypointY);
   }
@@ -179,11 +178,10 @@ public class Mob
       
     boolean verticalCollide = isVerticalCollided(stepY),
       horizontalCollide = isHorizontalCollided(stepX);
-      
+    
     if(verticalCollide && horizontalCollide)
     {
-      //updateWaypoint();
-      //or probably do something to try to escape the situation.
+      //should not be happening, if so it's bad path finding.
       return;
     }
     else if(verticalCollide && !horizontalCollide)
@@ -191,8 +189,7 @@ public class Mob
       if(Math.abs(deltaX) < speed)
       {
         this.mobX = targetX;
-        updateAllConditionRanges();
-        updateWaypoint();
+        updatePath();
       }
       else
       { this.mobX += speed * Math.signum(stepX); }
@@ -202,8 +199,7 @@ public class Mob
       if(Math.abs(deltaY) < speed)
       {
         this.mobY = targetY;
-        updateAllConditionRanges();
-        updateWaypoint();
+        updatePath();
       }
       else
       { this.mobY += speed * Math.signum(stepY); } 
@@ -214,8 +210,7 @@ public class Mob
       {
         this.mobX = targetX;
         this.mobY = targetY;
-        updateAllConditionRanges();
-        updateWaypoint();
+        updatePath();
       }
       else
       {
@@ -229,318 +224,131 @@ public class Mob
   private boolean isVerticalCollided(float stepY)
   {
     float nextY = mobY + stepY;
-    if(stepY < 0)
-    {
-      //check topRow obstacles
-      /*
-      if(arrRow.length == 0 || rowIndexRange.begin == -1)
-      {
-        return nextY < gridSize;
-      }
-      if(nextY < (getRowValue(rowIndexRange.begin) + 1) * gridSize)
-      {
-        int last = findLastSameValueIndex(rowIndexRange.begin, Dimension.ROW);
-        for(int i=rowIndexRange.begin; i <= last; i++)
-        {
-          float thisObsLeftX = arrRow[i].getObsColumn() * gridSize;
-          float thisObsRightX = arrRow[i].getObsColumn() * gridSize + gridSize;
-          if(mobX < thisObsRightX && mobX + mobSize > thisObsLeftX)
-          {
-            isCollided = true;
-            break;
-          }
-        }
-      }
-      if(nextY < gridSize) { isCollided = true; }
-      */
-      int nextRow = (int)(nextY / gridSize),
-        leftColumn = (int)(mobX / gridSize),
-        rightColumn = (int)((mobX + mobSize - 1) / gridSize);
-      if(!isObstacle(nextRow, leftColumn) &&
-        !isObstacle(nextRow, rightColumn)) { return false; }
-      else { return true; }
-    }
-    else
-    {
-      //check bottomRow obstacles
-      /*
-      if(arrRow.length == 0 || rowIndexRange.end == -1)
-      {
-        return nextY > height - gridSize - mobSize ;
-      }
-      if(nextY > (getRowValue(rowIndexRange.end) - 1) * gridSize)
-      {
-        int first = findFirstSameValueIndex(rowIndexRange.end, Dimension.ROW);
-        for(int i=rowIndexRange.end; i >= first; i--)
-        {
-          float thisObsLeftX = arrRow[i].getObsColumn() * gridSize;
-          float thisObsRightX = arrRow[i].getObsColumn() * gridSize + gridSize;
-          if(mobX < thisObsRightX && mobX + mobSize > thisObsLeftX)
-          {
-            isCollided = true;
-            break;
-          }
-        }
-      }
-      if(nextY > height - gridSize - mobSize) { isCollided = true; }
-      */
-      int nextRow = (int)((nextY + mobSize) / gridSize),
-        leftColumn = (int)(mobX / gridSize),
-        rightColumn = (int)((mobX + mobSize - 1) / gridSize);
-      if(!isObstacle(nextRow, leftColumn) &&
-        !isObstacle(nextRow, rightColumn)) { return false; }
-      else { return true; }
-    }
+    int nextRow = 0;
+    if(stepY < 0) { nextRow = (int)(nextY / gridSize); }
+    else { nextRow = (int)((nextY + mobSize) / gridSize); }
+    int leftColumn = (int)(mobX / gridSize),
+      rightColumn = (int)((mobX + mobSize - 1) / gridSize);
+    return isObstacle(nextRow, leftColumn) || isObstacle(nextRow, rightColumn);
   }
   
   private boolean isHorizontalCollided(float stepX)
   {
     float nextX = mobX + stepX;
-    if(stepX < 0)
-    {
-      //check leftColumn obstacles
-      /*
-      if(arrColumn.length == 0 || columnIndexRange.begin == -1)
-      {
-        return nextX < gridSize;
-      }
-      if(nextX < (getColumnValue(columnIndexRange.begin) + 1) * gridSize)
-      {
-        int last = findLastSameValueIndex(columnIndexRange.begin, Dimension.COLUMN);
-        for(int i=columnIndexRange.begin; i <= last; i++)
-        {
-          float thisObsTopY = arrColumn[i].getObsRow() * gridSize;
-          float thisObsBottomY = arrColumn[i].getObsRow() * gridSize + gridSize;
-          if(mobY < thisObsBottomY && mobY + mobSize > thisObsTopY)
-          {
-            isCollided = true;
-            break;
-          }
-        }
-      }
-      if(nextX < gridSize) { isCollided = true; }
-      */
-      int nextColumn = (int)(nextX / gridSize),
-        topRow = (int)(mobY / gridSize),
-        bottomRow = (int)((mobY + mobSize - 1) / gridSize);
-      if(!isObstacle(topRow, nextColumn) &&
-        !isObstacle(bottomRow, nextColumn)) { return false; }
-      else { return true; }
-    }
-    else
-    {
-      /*
-      if(arrColumn.length == 0 || columnIndexRange.end == -1)
-      {
-        return nextX > width - gridSize - mobSize;
-      }
-      if(nextX > (getColumnValue(columnIndexRange.end) - 1) * gridSize)
-      {
-        int first = findFirstSameValueIndex(columnIndexRange.end, Dimension.COLUMN);
-        for(int i=columnIndexRange.end; i >= first; i--)
-        {
-          float thisObsTopY = arrColumn[i].getObsRow() * gridSize;
-          float thisObsBottomY = arrColumn[i].getObsRow() * gridSize + gridSize;
-          if(mobY < thisObsBottomY && mobY + mobSize > thisObsTopY)
-          {
-            isCollided = true;
-            break;
-          }
-        }
-      }
-      if(nextX > width - gridSize - mobSize) { isCollided = true; }
-      */
-      int nextColumn = (int)((nextX + mobSize) / gridSize),
-        topRow = (int)(mobY / gridSize),
-        bottomRow = (int)((mobY + mobSize - 1) / gridSize);
-      if(!isObstacle(topRow, nextColumn) &&
-        !isObstacle(bottomRow, nextColumn)) { return false; }
-      else { return true; }
-    }
-  }
-  
-  private ArrayList<Gap> getGapArray()
-  {
-    ArrayList<Gap> gapArray = new ArrayList<Gap>();
-    
-    int maxColumns = (int)(width / gridSize) - 1,
-      maxRows = (int)(height / gridSize) - 1;
-    
-    int topRow=0, bottomRow=0, leftColumn=0, rightColumn=0;
-    
-    if(rowIndexRange.begin == -1) { topRow = 1; }
-    else { topRow = getRowValue(rowIndexRange.begin); }
-    if(rowIndexRange.end == -1) { bottomRow = maxRows - 1; }
-    else { bottomRow = getRowValue(rowIndexRange.end); }
-    if(columnIndexRange.begin == -1) { leftColumn = 1; }
-    else { leftColumn = getColumnValue(columnIndexRange.begin); }
-    if(columnIndexRange.end == -1) { rightColumn = maxColumns - 1; }
-    else { rightColumn = getColumnValue(columnIndexRange.end); }
-    
-    int finalTopRow = topRow, finalBottomRow = bottomRow,
-      finalLeftColumn = leftColumn, finalRightColumn = rightColumn;
-    
-    /* print("topR: "+topRow+" botR: "+bottomRow
-      +"\nlefC: "+leftColumn+" rigC: "+rightColumn+"\n"); */
-    
-    //get top side gaps
-    if(rowIndexRange.begin != -1)
-    { 
-      if(topRow >= 1)
-      {
-        for(int i=leftColumn; i <= rightColumn; i++)
-        {
-          gapArray.add(new Gap(topRow, i, Direction.FACE_UP));
-        }
-        for(int i=rowIndexRange.begin;
-          i <= findLastSameValueIndex(rowIndexRange.begin, Dimension.ROW); i++)
-        {
-          int thisObsColumn = arrRow[i].getObsColumn();
-          gapArray.removeIf(gap -> gap.matches(finalTopRow, thisObsColumn, Direction.FACE_UP));
-        }
-        if(rowIndexRange.begin >= 1)
-        {
-          for(int i=findFirstSameValueIndex(rowIndexRange.begin - 1, Dimension.ROW);
-            i <= rowIndexRange.begin - 1; i++)
-          {
-            int thisObsColumn = arrRow[i].getObsColumn();
-            gapArray.removeIf(gap -> gap.matches(finalTopRow, thisObsColumn, Direction.FACE_UP));
-          }
-        }
-      }
-    }
-    //get bottom side gaps
-    if(rowIndexRange.end != -1)
-    {
-      if(bottomRow <= maxRows - 1)
-      {
-        for(int i=leftColumn; i <= rightColumn; i++)
-        {
-          gapArray.add(new Gap(bottomRow, i, Direction.FACE_DOWN));
-        }
-        for(int i=rowIndexRange.end;
-          i >= findFirstSameValueIndex(rowIndexRange.end, Dimension.ROW); i--)
-        {
-          int thisObsColumn = arrRow[i].getObsColumn();
-          gapArray.removeIf(gap -> gap.matches(finalBottomRow, thisObsColumn, Direction.FACE_DOWN));
-        }
-        if(rowIndexRange.end <= arrRow.length - 2)
-        {
-          for(int i=findLastSameValueIndex(rowIndexRange.end + 1, Dimension.ROW);
-            i >= rowIndexRange.end + 1; i--)
-          {
-            int thisObsColumn = arrRow[i].getObsColumn();
-            gapArray.removeIf(gap -> gap.matches(finalBottomRow, thisObsColumn, Direction.FACE_DOWN));
-          }
-        }
-      }
-    }
-    //get left side gaps
-    if(columnIndexRange.begin != -1)
-    {
-      if(leftColumn >= 1)
-      {
-        for(int i=topRow; i <= bottomRow; i++)
-        {
-          gapArray.add(new Gap(i, leftColumn, Direction.FACE_LEFT));
-        }
-        for(int i=columnIndexRange.begin;
-          i <= findLastSameValueIndex(columnIndexRange.begin, Dimension.COLUMN); i++)
-        {
-          int thisObsRow = arrColumn[i].getObsRow();
-          gapArray.removeIf(gap -> gap.matches(thisObsRow, finalLeftColumn, Direction.FACE_LEFT));
-        }
-        if(columnIndexRange.begin >= 1)
-        {
-          for(int i=findFirstSameValueIndex(columnIndexRange.begin - 1, Dimension.COLUMN);
-            i <= columnIndexRange.begin - 1; i++)
-          {
-            int thisObsRow = arrColumn[i].getObsRow();
-            gapArray.removeIf(gap -> gap.matches(thisObsRow, finalLeftColumn, Direction.FACE_LEFT));
-          }
-        }
-      }
-    }
-    //get right side gaps
-    if(columnIndexRange.end != -1)
-    {
-      if(rightColumn <= maxColumns - 1)
-      {
-        for(int i=topRow; i <= bottomRow; i++)
-        {
-          gapArray.add(new Gap(i, rightColumn, Direction.FACE_RIGHT));
-        }
-        for(int i=columnIndexRange.end;
-          i >= findFirstSameValueIndex(columnIndexRange.end, Dimension.COLUMN); i--)
-        {
-          int thisObsRow = arrColumn[i].getObsRow();
-          gapArray.removeIf(gap -> gap.matches(thisObsRow, finalRightColumn, Direction.FACE_RIGHT));
-        }
-        if(columnIndexRange.end < arrColumn.length - 2)
-        {
-          for(int i=findLastSameValueIndex(columnIndexRange.end + 1, Dimension.COLUMN);
-            i >= columnIndexRange.end + 1; i--)
-          {
-            int thisObsRow = arrColumn[i].getObsRow();
-            gapArray.removeIf(gap -> gap.matches(thisObsRow, finalRightColumn, Direction.FACE_RIGHT));
-          }
-        }
-      } 
-    }
-    return gapArray;
-  }
-  
-  private void updateWaypoint()
-  {  
-    ArrayList<Gap> gapArray = getGapArray();
-    /*
-    print(mobHealth+"\n");
-    for(Gap thisGap: gapArray)
-    {
-      print("Row: "+thisGap.gapRow+" Column: "+thisGap.gapColumn+" Direction: "+thisGap.gapDirection+"\n");
-    }
-    */
-    if(gapArray.size() == 0) { return; }
-    
-    float[] weight = new float[gapArray.size()];
-    int minIndex = 0;
-    for(int i=0; i < gapArray.size(); i++)
-    {
-      float thisGapX = gapArray.get(i).gapColumn * gridSize,
-        thisGapY = gapArray.get(i).gapRow * gridSize;
-      float thisWeight = dist(thisGapX, thisGapY, mobX, mobY)
-        + dist(thisGapX, thisGapY, player.playerX, player.playerY) * 3;
-      weight[i] = thisWeight;
-      if(thisWeight < weight[minIndex]) { minIndex = i; }
-    }
-    /* print("Final decision-> Row: "+gapArray.get(minIndex).gapRow+" Column: "
-      +gapArray.get(minIndex).gapColumn+" Direction: "+gapArray.get(minIndex).gapDirection+"\n\n");  */
-    
-    float targetX = gapArray.get(minIndex).gapColumn * gridSize,
-      targetY = gapArray.get(minIndex).gapRow * gridSize;
-    Direction targetDir = gapArray.get(minIndex).gapDir;
-    
-    waypoint = new Waypoint(targetX, targetY, targetDir);
-  }
-  
-  private void updateAllConditionRanges()
-  {
-    updateRowConditionRange();
-    updateColumnConditionRange();
-  }
-  
-  private void updateRowConditionRange()
-  {
-    IndexRange newRowConditionRange = getRowConditionRange(mobY);
-    rowIndexRange.begin = newRowConditionRange.begin;
-    rowIndexRange.end = newRowConditionRange.end;
+    int nextColumn = 0;
+    if(stepX < 0) { nextColumn = (int)(nextX / gridSize); }
+    else { nextColumn = (int)((nextX + mobSize) / gridSize); }
+    int topRow = (int)(mobY / gridSize),
+      bottomRow = (int)((mobY + mobSize - 1) / gridSize);
+    return isObstacle(topRow, nextColumn) || isObstacle(bottomRow, nextColumn);
   }
 
-  private void updateColumnConditionRange()
+  private void updatePath()
   {
-    IndexRange newColumnConditionRange = getColumnConditionRange(mobX);
-    columnIndexRange.begin = newColumnConditionRange.begin;
-    columnIndexRange.end = newColumnConditionRange.end;
+    if(path.size() <= 1) { resetPath(); }
+    else { path.remove(0); }
+  }
+  
+  private void resetPath()
+  {
+    ArrayList<int[]> newPath = getPath();
+    if(path.size() <= 1 || !isSamePath(originalPath, newPath))
+    {
+      originalPath = newPath;
+      path = newPath;
+    }
+  }
+  
+  private boolean isSamePath(ArrayList<int[]> originP, ArrayList<int[]> newP)
+  {
+    if(originP == null || newP == null) { return originP == newP; }
+    if(originP.size() != newP.size()) { return false; }
+    for(int i = 0; i < originP.size(); i++)
+    {
+      if(!Arrays.equals(originP.get(i), newP.get(i))) { return false; }
+    }
+    return true;
+  }
+  
+  private ArrayList<int[]> getPath()
+  {
+    int endRow = max((int)((player.playerY + player.playerSize / 2) / gridSize) - 1, 0),
+      endColumn = max((int)((player.playerX + player.playerSize / 2) / gridSize) - 1, 0);
+     
+    int startRow = max((int)((mobY + mobSize / 2) / gridSize) - 1, 0),
+      startColumn = max((int)((mobX + mobSize / 2) / gridSize) - 1, 0);
+      
+    Queue<int[]> queue = new ArrayDeque<>();
+    boolean[] visited = Arrays.copyOf(obsArr, obsArr.length);
+    int[][] directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+    
+    Map<Integer, Integer> parentMap = new HashMap<>();
+    
+    queue.add(new int[]{startRow, startColumn});
+    parentMap.put(startRow * columns + startColumn, -1);
+    visited[startRow * columns + startColumn] = true;
+    
+    while(!queue.isEmpty())
+    {
+      int[] cur = queue.poll();
+      if(cur[0] == endRow && cur[1] == endColumn) { break; }
+      
+      for(int i = 0; i < 4; i++)
+      {
+        int nextRow = cur[0] + directions[i][0],
+          nextColumn = cur[1] + directions[i][1];
+        if(nextRow >= 0 && nextRow <= rows - 1
+          && nextColumn >= 0 && nextColumn <= columns - 1)
+        {
+          if(!visited[nextRow * columns + nextColumn])
+          {
+            queue.add(new int[]{nextRow, nextColumn});
+            parentMap.put(nextRow * columns + nextColumn, cur[0] * columns + cur[1]);
+            visited[nextRow * columns + nextColumn] = true;
+          }
+        }
+      }
+    }
+    ArrayList<int[]> path = new ArrayList<>();
+    Integer cur = endRow * columns + endColumn;
+    if(!parentMap.containsKey(cur)) { return path; }
+    
+    while(cur != null && cur != -1)
+    {
+      path.add(new int[]{cur / columns, cur % columns});
+      cur = parentMap.get(cur);
+    }
+    Collections.reverse(path);
+    return smoothPath(path);
+  }
+  
+  ArrayList<int[]> smoothPath(ArrayList<int[]> p)
+  {
+    if(p.size() <= 1) return p;
+
+    ArrayList<int[]> smoothedPath = new ArrayList<>();
+    smoothedPath.add(p.get(0));
+    int curIndex = 0;
+    
+    while(curIndex < p.size() - 1)
+    {
+      int farthestIndex = curIndex + 1;
+      
+      for(int i = curIndex + 1; i < p.size(); i++)
+      {
+        float curX = p.get(curIndex)[1] * gridSize,
+        curY = p.get(curIndex)[0] * gridSize,
+        targetX = p.get(i)[1] * gridSize,
+        targetY = p.get(i)[0] * gridSize;
+
+        if(LoS(curX, curY, targetX, targetY)) { farthestIndex = i; }
+        else { break; }
+      }
+      
+      smoothedPath.add(p.get(farthestIndex));
+      curIndex = farthestIndex;
+    }
+    return smoothedPath;
   }
 
   public void renderMob()
@@ -554,13 +362,6 @@ public class Mob
     fill(255);
     textSize(14);
     text("HP: "+mobHealth, this.mobX, this.mobY - 5);
-  }
-  
-  public boolean equals(Mob m)
-  {
-    if(this == m) { return true; }
-    else if(m == null) { return false; }
-    return mobX == m.getMobX() && mobY == m.getMobY() && mobHealth == m.getMobHealth();
   }
   
   public boolean isDead() { return mobHealth <= 0; }

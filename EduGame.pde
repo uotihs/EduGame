@@ -9,7 +9,6 @@ int rows = 7, columns = 9;
 
 float gridSize;
 int currentRow = 2, currentColumn = 2;
-ObstacleData[] arrRow, arrColumn;
 Player player;
 ArrayList<Mob> mobArr;
 
@@ -29,7 +28,6 @@ void setup()
   saver.saveIntoData(mapData);
   
   updateObsArr();
-  updateObstaclesArray();
   updateMobsArray();
 
   initializeImages();
@@ -41,17 +39,17 @@ void setup()
 
   player = new Player();
   
-  mobData[2][3] = appendTo(mobData[2][3], new MobData(4, 8));
+  //mobData[2][3] = appendTo(mobData[2][3], new MobData(4, 8));
   //obsData[2][1] = appendTo(obsData[2][1], new ObstacleData(8, 5, 0));
-  saver.saveIntoData(mapData);
+  //saver.saveIntoData(mapData);
 }
 
 void draw()
 {
   renderBackground();
   renderDoors();
-  player.renderPlayer();
   renderObstacles();
+  player.renderPlayer();
   clearDeadMobs();
   for(Mob thisMob: mobArr)
   {
