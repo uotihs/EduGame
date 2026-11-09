@@ -3,65 +3,6 @@ import java.util.ArrayList;
 import java.lang.IndexOutOfBoundsException;
 import java.util.Comparator;
 
-public enum Dimension { ROW, COLUMN }
-
-public enum Direction { FACE_UP, FACE_DOWN, FACE_LEFT, FACE_RIGHT, CROSSING_GAP }
-
-public class IndexRange
-{
-  public int begin=0, end=0;
-  public IndexRange(int inputBeginIndex, int inputEndIndex)
-  {
-    this.begin = inputBeginIndex;
-    this.end = inputEndIndex;
-  }
-}
-
-public class Gap
-{
-  private int gapRow=0, gapColumn=0;
-  private Direction gapDir = Direction.FACE_UP;
-  
-  Gap(int inputRow, int inputColumn, Direction inputDir)
-  {
-    this.gapRow = inputRow;
-    this.gapColumn = inputColumn;
-    this.gapDir = inputDir;
-  }
-  
-   public boolean matches(int targetRow, int targetColumn, Direction targetDir)
-   {
-     return gapRow == targetRow && 
-      gapColumn == targetColumn &&
-      gapDir == targetDir;
-   }
-   
-   public int getGapRow() { return gapRow; }
-   public int getGapColumn() { return gapColumn; }
-   public Direction getGapDir() { return gapDir; }
-}
-
-public class Waypoint
-{
-  private float waypointX=0, waypointY=0;
-  private Direction waypointDir = Direction.FACE_UP;
-  
-  public Waypoint(float inputX, float inputY, Direction inputDir)
-  {
-    this.waypointX = inputX;
-    this.waypointY = inputY;
-    this.waypointDir = inputDir;
-  }
-  
-  public float getWaypointX() { return waypointX; }
-  public float getWaypointY() { return waypointY; }
-  public Direction getWaypointDir() { return waypointDir; }
-  
-  public void addWaypointX(float deltaX) { this.waypointX += deltaX; }
-  public void addWaypointY(float deltaY) { this.waypointY += deltaY; }
-  public void setWaypointDir(Direction inputDir) { this.waypointDir = inputDir; }
-}
-
 public static <T> T[] appendTo(T[] oldArr, T item)
 {
   T[] newArr = Arrays.copyOf(oldArr, oldArr.length + 1);
@@ -76,12 +17,13 @@ public void updateObsArr()
   obsArr = new boolean[rows * columns];
   for(ObstacleData obs : obsData[currentRow][currentColumn])
   {
-    obsArr[(obs.getObsRow() - 1) * columns + obs.getObsColumn() - 1] = true; 
+    obsArr[(obs.getObsRow() - 1) * columns + obs.getObsColumn() - 1] = true;
   }
 }
 
 public boolean isObstacle(int thisRow, int thisColumn)
 {
+  //Subtract 1 to solve the conflict.
   thisRow -= 1;
   thisColumn -= 1;
   if(thisRow < 0 || thisRow > rows - 1 ||
@@ -109,150 +51,12 @@ public void renderMobs()
   for(Mob thisMob: mobArr)
   {
     thisMob.renderMob();
-    float thisTargetX = thisMob.waypoint.getWaypointX(),
-      thisTargetY = thisMob.waypoint.getWaypointY();
+    float thisTargetRow = thisMob.path.get(0)[0],
+      thisTargetColumn = thisMob.path.get(0)[1];
     text("mobX: "+thisMob.getMobX()+" mobY: "+thisMob.getMobY()+" hp: "+thisMob.getMobHealth()
-      +"\nTarget: ("+thisTargetX+", "+thisTargetY+")"
-      +"\nTargetRC: ("+thisTargetY / gridSize+", "+thisTargetX / gridSize+")"
-      +"\nDirection: "+thisMob.waypoint.getWaypointDir(), 300, d * 100 + 300);
+      +"\nTargetRC: ("+thisTargetRow+", "+thisTargetColumn+")", 300, d * 100 + 300);
     d += 1;
   }
-}
-
-public void updateObstaclesArray()
-{
-  ObstacleData[] thisObsData = obsData[currentRow][currentColumn];
-  arrRow = Arrays.copyOf(thisObsData, thisObsData.length);
-  arrColumn = Arrays.copyOf(thisObsData, thisObsData.length);
-    
-  Arrays.sort(arrRow, Comparator.comparingInt(obs -> obs.getObsRow()));
-  Arrays.sort(arrColumn, Comparator.comparingInt(obs -> obs.getObsColumn()));
-}
-
-public IndexRange getRowConditionRange(float inputY)
-{
-  if(arrRow.length == 0) 
-  { 
-    return new IndexRange(-1, -1); 
-  }
-  
-  int rowBeginIndex = 0, rowEndIndex = arrRow.length - 1;
-  
-  for(int i = 0; i < arrRow.length; i++) 
-  {
-    if((getRowValue(i) + 1) * gridSize <= inputY + 1) 
-    {
-      rowBeginIndex = i;
-    }
-  }
-  rowBeginIndex = findFirstSameValueIndex(rowBeginIndex, Dimension.ROW);
-    
-  for(int i = arrRow.length - 1; i >= 0; i--) 
-  {
-    if(getRowValue(i) * gridSize >  inputY) 
-    {
-      rowEndIndex = i;
-    }
-  }
-  rowEndIndex = findLastSameValueIndex(rowEndIndex, Dimension.ROW);
-    
-  if(getRowValue(rowBeginIndex) == getRowValue(0)
-    && getRowValue(rowEndIndex) == getRowValue(0)) 
-  { 
-    rowBeginIndex = -1; 
-  }
-  else if(getRowValue(rowBeginIndex) == getRowValue(arrRow.length - 1)
-    && getRowValue(rowEndIndex) == getRowValue(arrRow.length - 1))
-  { 
-    rowEndIndex = -1; 
-  }
-  return new IndexRange(rowBeginIndex, rowEndIndex);
-}
-
-public IndexRange getColumnConditionRange(float inputX)
-{
-  if(arrColumn.length == 0) 
-  {
-    return new IndexRange(-1, -1); 
-  }
-
-  int columnBeginIndex = 0, columnEndIndex = arrColumn.length - 1;
-    
-  for(int i = 0; i < arrColumn.length; i++) 
-  {
-    if((arrColumn[i].getObsColumn() + 1) * gridSize <= inputX + 1)
-    {
-      columnBeginIndex = i;
-    }
-  }
-  columnBeginIndex = findFirstSameValueIndex(columnBeginIndex, Dimension.COLUMN);
-    
-  for(int i = arrColumn.length - 1; i >= 0; i--)
-  {
-    if(getColumnValue(i) * gridSize > inputX)
-    {
-      columnEndIndex = i;  
-    }
-  }
-  columnEndIndex = findLastSameValueIndex(columnEndIndex, Dimension.COLUMN);
-    
-  if(getColumnValue(columnBeginIndex) == getColumnValue(0)
-    && getColumnValue(columnEndIndex) == getColumnValue(0)) 
-  { 
-    columnBeginIndex = -1; 
-  }
-  else if(getColumnValue(columnBeginIndex) == getColumnValue(arrColumn.length - 1)
-    && getColumnValue(columnEndIndex) == getColumnValue(arrColumn.length - 1))
-  { 
-    columnEndIndex = -1; 
-  }
-  return new IndexRange(columnBeginIndex, columnEndIndex);
-}
-
-private int findLastSameValueIndex(int index, Dimension dimension)
-{
-  switch(dimension)
-  {
-    case ROW:
-      while(index + 1 < arrRow.length &&
-        arrRow[index].getObsRow() == arrRow[index + 1].getObsRow()) { index += 1; }
-      break;
-    case COLUMN:
-      while(index + 1 < arrColumn.length &&
-        arrColumn[index].getObsColumn() == arrColumn[index + 1].getObsColumn()) { index += 1; }
-      break;
-    default:
-      throw new IllegalArgumentException("Unidentified dimension: "+dimension);
-  }
-  return index;
-}
-  
-public int findFirstSameValueIndex(int index, Dimension dimension)
-{
-  switch(dimension)
-  {
-    case ROW:
-      while(index > 0 &&
-        arrRow[index].getObsRow() == arrRow[index - 1].getObsRow()) { index -= 1; }
-      break;
-    case COLUMN:
-      while(index > 0 &&
-        arrColumn[index].getObsColumn() == arrColumn[index - 1].getObsColumn()) { index -= 1; }
-      break;
-    default:
-      throw new IllegalArgumentException("Unidentified dimension: "+dimension);
-  }
-  return index;
-}
-  
-public int getRowValue(int rowIndex)
-{
-  return arrRow[rowIndex].getObsRow();
-}
-
-public int getColumnValue(int columnIndex)
-{
-  return arrColumn[columnIndex].getObsColumn();
 }
   
 public void initializeImages()
@@ -377,7 +181,6 @@ public void enterTopPortal()
   if(hasTopRoom())
   { 
     currentRow -= 1;
-    updateObstaclesArray();
     updateMobsArray();
   }
 }
@@ -386,7 +189,6 @@ public void enterBottomPortal()
   if(hasBottomRoom())
   { 
     currentRow += 1;
-    updateObstaclesArray();
     updateMobsArray();
   }
 }
@@ -395,7 +197,6 @@ public void enterLeftPortal()
   if(hasLeftRoom())
   { 
     currentColumn -= 1;
-    updateObstaclesArray();
     updateMobsArray();
   }
 }
@@ -404,7 +205,6 @@ public void enterRightPortal()
   if(hasRightRoom())
   { 
     currentColumn += 1;
-    updateObstaclesArray();
     updateMobsArray();
   }
 }
