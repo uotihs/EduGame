@@ -47,16 +47,16 @@ public class Bullet
   }
 
   // 檢查是否擊中敵人
-  public void CheckHit(Mob mobdata)
+  public void CheckHit(Mob mob)
   {
-    if (!isAlive || !mobdata.isDead()) return;
+    if (!isAlive || !mob.isDead()) return;
 
-    float enemyCenterX = mobdata.mobX() + 20;
-    float enemyCenterY = mobdata.mobY() + 20;
+    float enemyCenterX = mob.getMobX() + 20;
+    float enemyCenterY = mob.getMobY() + 20;
 
     if (dist(x, y, enemyCenterX, enemyCenterY) < (bulletSize / 2 + 20))
     {
-      mobdata.takeDamage(damage);
+      mob.addMobHealth(damage * -1);
       isAlive = false; 
     }
   }

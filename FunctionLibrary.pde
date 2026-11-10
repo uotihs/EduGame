@@ -2,6 +2,15 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.lang.IndexOutOfBoundsException;
 import java.util.Comparator;
+import java.util.Random;
+
+public final int[] U = {-1, 0}, D = {1, 0}, L = {0, -1}, R = {0, 1};
+
+public final int[][][] directions =
+  {{U, D, L, R}, {U, D, R, L}, {U, L, D, R}, {U, L, R, D}, {U, R, D, L}, {U, R, L, D},
+  {D, U, L, R}, {D, U, R, L}, {D, L, U, R}, {D, L, R, U}, {D, R, U, L}, {D, R, L, U},
+  {L, U, D, R}, {L, U, R, D}, {L, D, U, R}, {L, D, R, U}, {L, R, U, D}, {L, R, D, U},
+  {R, U, D, L}, {R, U, L, D}, {R, D, U, L}, {R, D, L, U}, {R, L, U, D}, {R, L, D, U}};
 
 public static <T> T[] appendTo(T[] oldArr, T item)
 {

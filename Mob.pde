@@ -8,7 +8,7 @@ public class Mob
 {
   private float mobX=0, mobY=0, mobSize=0;
   private float speed=2;
-  private int mobType=0, mobHealth=0;
+  private int mobType=0, mobHealth=0, randSeed=0;
   private ArrayList<int[]> path = new ArrayList<>(),
     originalPath = new ArrayList<>();
   private boolean preCanSee = true;
@@ -19,6 +19,7 @@ public class Mob
     this.mobY = mobdata.getMobRow() * gridSize;
     this.mobHealth = mobdata.getMobHealth();
     this.mobSize = gridSize;
+    this.randSeed = rand.nextInt(24);
     updatePath();
   }
 
@@ -280,7 +281,7 @@ public class Mob
       
     Queue<int[]> queue = new ArrayDeque<>();
     boolean[] visited = Arrays.copyOf(obsArr, obsArr.length);
-    int[][] directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+    int[][] thisDirections = directions[randSeed];
     
     Map<Integer, Integer> parentMap = new HashMap<>();
     
@@ -295,8 +296,8 @@ public class Mob
       
       for(int i = 0; i < 4; i++)
       {
-        int nextRow = cur[0] + directions[i][0],
-          nextColumn = cur[1] + directions[i][1];
+        int nextRow = cur[0] + thisDirections[i][0],
+          nextColumn = cur[1] + thisDirections[i][1];
         if(nextRow >= 0 && nextRow <= rows - 1
           && nextColumn >= 0 && nextColumn <= columns - 1)
         {
@@ -369,4 +370,6 @@ public class Mob
   public float getMobX() { return mobX; }
   public float getMobY() { return mobY; }
   public int getMobHealth() { return mobHealth; }
+  
+  public void addMobHealth(int inputValue) { this.mobHealth += inputValue; }
 }

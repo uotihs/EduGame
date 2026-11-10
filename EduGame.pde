@@ -6,6 +6,7 @@ ObstacleData[][][] obsData;
 
 boolean[] obsArr;
 int rows = 7, columns = 9;
+Random rand = new Random();
 
 float gridSize;
 int currentRow = 2, currentColumn = 2;
