@@ -119,34 +119,38 @@ public void tmpDisplayRoomInformation()
 
 public boolean hasTopRoom()
 {
-  boolean topRoomExist = true;
-  try { if(roomDisData[currentRow - 1][currentColumn] == -1) { topRoomExist = false; } }
-  catch(IndexOutOfBoundsException e) { topRoomExist = false; }
-  return topRoomExist;
+  if(currentRow - 1 < 0) { return false; }
+  else if(roomDisData[currentRow - 1][currentColumn] == -1
+    || (roomDisData[currentRow - 1][currentColumn] == 67 
+    && roomDisData[currentRow][currentColumn] % 10 != 3)) { return false; }
+  return true;
 }
 
 public boolean hasBottomRoom()
 {
-  boolean bottomRoomExist = true;
-  try { if(roomDisData[currentRow + 1][currentColumn] == -1) { bottomRoomExist = false; } }
-  catch(IndexOutOfBoundsException e) { bottomRoomExist = false; }
-  return bottomRoomExist;
+  if(currentRow + 1 > 4) { return false; }
+  else if(roomDisData[currentRow + 1][currentColumn] == -1
+    || (roomDisData[currentRow + 1][currentColumn] == 67 
+    && roomDisData[currentRow][currentColumn] % 10 != 3)) { return false; }
+  return true;
 }
 
 public boolean hasLeftRoom()
 {
-  boolean leftRoomExist = true;
-  try { if(roomDisData[currentRow][currentColumn - 1] == -1) { leftRoomExist = false; } }
-  catch(IndexOutOfBoundsException e) { leftRoomExist = false; }
-  return leftRoomExist;
+  if(currentColumn - 1 < 0) { return false; }
+  else if(roomDisData[currentRow][currentColumn - 1] == -1
+    || (roomDisData[currentRow][currentColumn - 1] == 67 
+    && roomDisData[currentRow][currentColumn] % 10 != 3)) { return false; }
+  return true;
 }
 
 public boolean hasRightRoom()
 {
-  boolean rightRoomExist = true;
-  try { if(roomDisData[currentRow][currentColumn + 1] == -1) { rightRoomExist = false; } }
-  catch(IndexOutOfBoundsException e) { rightRoomExist = false; }
-  return rightRoomExist;
+  if(currentColumn + 1 > 4) { return false; }
+  else if(roomDisData[currentRow][currentColumn + 1] == -1
+    || (roomDisData[currentRow][currentColumn + 1] == 67 
+    && roomDisData[currentRow][currentColumn] % 10 != 3)) { return false; }
+  return true;
 }
 
 public void renderBackground()
@@ -185,12 +189,21 @@ public void renderObstacles()
   }
 }
 
+public boolean isTeleportRoom() { return roomDisData[currentRow][currentColumn] == 67; }
+
+public void teleportToSpawn()
+{
+  currentRow = 2;
+  currentColumn = 2;
+  updateAllArrays();
+}
+
 public void enterTopPortal()
 {
   if(hasTopRoom())
   { 
     currentRow -= 1;
-    updateMobsArray();
+    updateAllArrays();
   }
 }
 public void enterBottomPortal()
@@ -198,7 +211,7 @@ public void enterBottomPortal()
   if(hasBottomRoom())
   { 
     currentRow += 1;
-    updateMobsArray();
+    updateAllArrays();
   }
 }
 public void enterLeftPortal()
@@ -206,7 +219,7 @@ public void enterLeftPortal()
   if(hasLeftRoom())
   { 
     currentColumn -= 1;
-    updateMobsArray();
+    updateAllArrays();
   }
 }
 public void enterRightPortal()
@@ -214,6 +227,12 @@ public void enterRightPortal()
   if(hasRightRoom())
   { 
     currentColumn += 1;
-    updateMobsArray();
+    updateAllArrays();
   }
+}
+
+public void updateAllArrays()
+{
+  updateObsArr();
+  updateMobsArray();
 }

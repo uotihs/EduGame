@@ -9,8 +9,7 @@ public class Player
   public Player()
   {
     this.playerSize = gridSize;
-    this.playerX = width / 2 - playerSize / 2;
-    this.playerY = height / 2 - playerSize / 2;
+    centeringPlayer();
     this.preRow = (int)((playerY + playerSize / 2) / gridSize);
     this.preColumn = (int)((playerX + playerSize / 2) / gridSize);
   }
@@ -21,9 +20,16 @@ public class Player
       hasTopRoom() && mobArr.isEmpty())
     { 
       enterTopPortal();
-      this.playerX = width / 2 - playerSize / 2;
-      this.playerY = height - gridSize - playerSize;
-      updateObsArr();
+      if(isTeleportRoom())
+      {
+        centeringPlayer();
+        teleportToSpawn();
+      }
+      else
+      {
+        this.playerX = width / 2 - playerSize / 2;
+        this.playerY = height - gridSize - playerSize;
+      }
       updateMobsPath();
       return;
     }
@@ -45,9 +51,16 @@ public class Player
       hasBottomRoom() && mobArr.isEmpty())
     { 
       enterBottomPortal();
-      this.playerX = width / 2 - playerSize / 2;
-      this.playerY = gridSize * 1;
-      updateObsArr();
+      if(isTeleportRoom())
+      {
+        centeringPlayer();
+        teleportToSpawn();
+      }
+      else
+      {
+        this.playerX = width / 2 - playerSize / 2;
+        this.playerY = gridSize * 1;
+      }
       updateMobsPath();
       return;
     }
@@ -69,9 +82,16 @@ public class Player
       hasLeftRoom() && mobArr.isEmpty())
     { 
       enterLeftPortal();
-      this.playerX = width - gridSize - playerSize;
-      this.playerY = height / 2 - playerSize / 2;
-      updateObsArr();
+      if(isTeleportRoom())
+      {
+        centeringPlayer();
+        teleportToSpawn();
+      }
+      else
+      {
+        this.playerX = width - gridSize - playerSize;
+        this.playerY = height / 2 - playerSize / 2;
+      }
       updateMobsPath();
       return;
     }
@@ -93,9 +113,16 @@ public class Player
       hasRightRoom() && mobArr.isEmpty())
     { 
       enterRightPortal();
-      this.playerX = gridSize * 1;
-      this.playerY = height / 2 - playerSize / 2;
-      updateObsArr();
+      if(isTeleportRoom())
+      {
+        centeringPlayer();
+        teleportToSpawn();
+      }
+      else
+      {
+        this.playerX = gridSize * 1;
+        this.playerY = height / 2 - playerSize / 2;
+      }
       updateMobsPath();
       return;
     }
@@ -151,4 +178,10 @@ public class Player
   public float getPlayerX() { return playerX; }
   public float getPlayerY() { return playerY; }
   public float getPlayerSize() { return playerSize; }
+  
+  public void centeringPlayer()
+  {
+    this.playerX = width / 2 - playerSize / 2;
+    this.playerY = height / 2 - playerSize / 2;
+  }
 }
