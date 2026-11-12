@@ -16,7 +16,7 @@ Button but = Button(String word,int centerx,int centery,int width,int height);
 
 1.    but.printButton();
 
-2.    if(but.checkmouse() == 1)
+2.    if(but.checkmouse() == true)
       {
             //the button is surely clicked!
       }
@@ -64,15 +64,15 @@ public class Button{
       public boolean pressed = false;
       public boolean onit = false;
       public String word = null;
-      int width;
-      int height;
-      public Button(String word,int centerx,int centery,int width,int height)
+      int width1;
+      int height1;
+      public Button(String word,int centerx,int centery,int width1,int height1)
       {
         this.word = word;
         this.centerx = centerx;
         this.centery= centery;
-        this.width = width;
-        this.height = height;
+        this.width1 = width1;
+        this.height1 = height1;
       }
       public void printButton()
       {
@@ -81,7 +81,7 @@ public class Button{
         if(onit)fill(#D8D8D8);
         if(pressed)fill(#5D5C5C);
         rectMode(CENTER);
-        rect(centerx,centery,this.width/5,this.height/8);
+        rect(centerx,centery,this.width1,this.height1);
         
         if(word!=null)
         {
@@ -95,7 +95,7 @@ public class Button{
       }
       public boolean checkmouse()
       {
-        if(mouseX >= this.centerx - this.width/5/2 && mouseX <= this.centerx + this.width/8/2 && mouseY >= this.centery - this.height/5/2 && mouseY <= this.centery + this.height/8/2 )
+        if(mouseX >= this.centerx - this.width1/2 && mouseX <= this.centerx + this.width1/2 && mouseY >= this.centery - this.height1/2 && mouseY <= this.centery + this.height1/2 )
         {
           if(mousePressed)
           {
@@ -130,23 +130,23 @@ public class SliderBar
   public boolean pressed = false;
   public boolean onit = false;
 
-  int width;
-  int height;
+  int width1;
+  int height1;
   boolean wasMousePressed = false;
 
-  public SliderBar(int centerx, int centery, int width, int height) 
+  public SliderBar(int centerx, int centery, int width1, int height1) 
   {
     this.centerx = centerx;
     this.centery = centery;
-    this.width = max(1, width);
-    this.height = max(1, height);
+    this.width1 = max(1, width1);
+    this.height1 = max(1, height1);
   }
 
   public float nowValue() 
   {
-    float left = centerx - this.width / 2.0f;
-    float right = centerx + this.width / 2.0f;
-    float radius = this.height / 2.0f;
+    float left = centerx - this.width1 / 2.0f;
+    float right = centerx + this.width1 / 2.0f;
+    float radius = this.height1 / 2.0f;
 
     this.onit = ((mouseX >= left - radius) && (mouseX <= right + radius) && (mouseY >= centery - radius) && (mouseY <= centery + radius));
 
@@ -169,8 +169,8 @@ public class SliderBar
   }
 
   public void printSlider() {
-    float left = this.centerx - this.width / 2.0f;
-    float right = this.centerx + this.width / 2.0f;
+    float left = this.centerx - this.width1 / 2.0f;
+    float right = this.centerx + this.width1 / 2.0f;
     float knobX = map(value, 0, 100, left, right);// this is the knot (ball on the slide)
 
     pushStyle(); // this func stores the outer style and do its
@@ -187,7 +187,7 @@ public class SliderBar
     if (this.onit) fill(#D8D8D8);
     if (this.pressed) fill(#5D5C5C);
     ellipseMode(CENTER);
-    ellipse(knobX, centery, this.height, this.height);
+    ellipse(knobX, centery, this.height1, this.height1);
 
     popStyle();
   }
