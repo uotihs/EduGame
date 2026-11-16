@@ -15,11 +15,6 @@ public class PlayerWeapon
     this.handOffsetY = gridSize * 0.08;
     this.holdDistance = gridSize * 0.35;
     updateWeapon();
-    
-    weaponImgs[0] = loadImage("weapon_lv1.png");
-    weaponImgs[1] = loadImage("weapon_lv2.png");
-    weaponImgs[2] = loadImage("weapon_lv3.png");
-    weaponImgs[3] = loadImage("weapon_lv4.png");
   }
 
   public void updateWeapon()
