@@ -137,7 +137,7 @@ public void initializeImages()
   //## 載入四個等級的武器 PNG 圖片 (放置於 data/images/ 資料夾下)
   for(int i=0; i < weaponImgs.length; i++)
   {
-    weaponImgs[i] = loadImage("images/weapon_lv" + (i + 1) + ".png");
+    weaponImgs[i] = loadImage("data/images/weapon_lv" + (i + 1) + ".png");
   }
 }
 

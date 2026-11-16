@@ -42,6 +42,7 @@ void setup()
   gridSize = width / 11;
 
   player = new Player();
+  weapon = new PlayerWeapon();//##
   
   //mobData[2][3] = appendTo(mobData[2][3], new MobData(4, 8));
   //obsData[2][1] = appendTo(obsData[2][1], new ObstacleData(8, 5, 0));

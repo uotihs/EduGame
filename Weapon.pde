@@ -1,8 +1,5 @@
 public class PlayerWeapon
 {
-  int level = 1;                       // 當前武器等級 (1 ~ 4)
-  final int MAX_LEVEL = 4;
-  
   private float weaponX = 0, weaponY = 0, weaponSize = 0;
   private float angle = 0;
   private float handOffsetY = 0, holdDistance = 0;
@@ -64,6 +61,13 @@ public class PlayerWeapon
     if(currentImg != null)
     {
       image(currentImg, 0, 0, this.weaponSize, this.weaponSize);
+    }
+    else
+    {
+      // 防呆暫代方塊
+      rectMode(CENTER);
+      fill(200);
+      rect(0, 0, this.weaponSize * 0.6, this.weaponSize * 0.25);
     }
 
     popStyle();
