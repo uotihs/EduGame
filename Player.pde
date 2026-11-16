@@ -3,7 +3,8 @@ public class Player
 {
   private float playerX=0, playerY=0, playerSize=0;
   private float speed = 10;
-  private int playerHealth = 100;
+  private int playerHealth = 0;
+  private final int maxPlayerHealth = 100;
   private int preRow = 0, preColumn = 0, distLimit = 3;
   // we can consider doing acceleration to get smoother movement?
   
@@ -13,6 +14,7 @@ public class Player
     centeringPlayer();
     this.preRow = (int)((playerY + playerSize / 2) / gridSize);
     this.preColumn = (int)((playerX + playerSize / 2) / gridSize);
+    playerHealth = maxPlayerHealth;
   }
   
   public void moveUp()
@@ -159,6 +161,14 @@ public class Player
           && (playerY < pointY) && (playerY + playerSize > pointY));
   }
   
+  public void updateMobsPath()
+  {
+    for(Mob mob: mobArr)
+    {
+      if(!mob.canSeePlayer()) { mob.resetPath(); }
+    }
+  }
+  
   public void renderPlayer()
   {
     // should do image(charcterTiles[i], playerX, playerY, playerSize, playerSize); here.
@@ -166,18 +176,17 @@ public class Player
     noStroke();
     fill(#F72A2A);
     rect(playerX, playerY, playerSize, playerSize);
-    // tmp hp bar
-    fill(255);
-    textSize(14);
-    text("HP: "+playerHealth, playerX, playerY - 5);
+    displayHealthPointBar();
   }
   
-  private void updateMobsPath()
+  private void displayHealthPointBar()
   {
-    for(Mob mob: mobArr)
-    {
-      if(!mob.canSeePlayer()) { mob.resetPath(); }
-    }
+    fill(#204D17);
+    rect(playerX - 5, playerY - gridSize / 5 - 5,
+      gridSize + 10, gridSize / 5);
+    fill(#2EDB09);
+    rect(playerX, playerY - gridSize / 5 - 1,
+      gridSize * ((float)playerHealth / maxPlayerHealth), gridSize / 10);
   }
   
   public boolean isDead() { return playerHealth <= 0; }
@@ -191,5 +200,8 @@ public class Player
     this.playerX = width / 2 - playerSize / 2;
     this.playerY = height / 2 - playerSize / 2;
   }
-  public void addPlayerHealth(int inputValue) { this.playerHealth += inputValue; }
+  public void addPlayerHealth(int inputValue)
+  { 
+    this.playerHealth = min(max(playerHealth + inputValue, 0), maxPlayerHealth);
+  }
 }

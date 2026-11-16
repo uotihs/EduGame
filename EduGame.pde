@@ -11,6 +11,9 @@ Random rand = new Random();
 float gridSize;
 int currentRow = 2, currentColumn = 2;
 Player player;
+boolean up=false, down=false,
+  left=false, right=false, shooting=false;
+  
 ArrayList<Mob> mobArr;
 ArrayList<Mob>[] mobGridArr;
 ArrayList<Bullet> bulletArr = new ArrayList<Bullet>();
@@ -53,31 +56,21 @@ void draw()
   renderObstacles();
   
   if(player.isDead()) { println("Game Over"); }
+  playerMoves();
+  playerShoots();
   player.renderPlayer();
   
-  clearDeadMobs();
   mobsMove();
   renderMobs();
   
   clearHitBullets();
   bulletsMove();
   renderBullets();
+  clearDeadMobs();
   
   tmpDisplayRoomInformation();
 }
 
-void keyPressed()
-{
-  if((keyCode == 87) || (keyCode == 38)) { player.moveUp(); }
-  if((keyCode == 83) || (keyCode == 40)) { player.moveDown(); }  
-  if((keyCode == 65) || (keyCode == 37)) { player.moveLeft(); }
-  if((keyCode == 68) || (keyCode == 39)) { player.moveRight(); }
-}
-
-void mouseClicked()
-{
-  bulletArr.add(
-    new Bullet(player.playerX + player.playerSize / 2, 
-      player.playerY + player.playerSize / 2, 
-      mouseX, mouseY, 10, TargetType.MOBS));
-}
+void keyPressed() { updateDirection(true); }
+void keyReleased() { updateDirection(false); }
+void mousePressed() { shooting = true; }

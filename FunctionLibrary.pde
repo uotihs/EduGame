@@ -21,6 +21,34 @@ public static <T> T[] appendTo(T[] oldArr, T item)
   return newArr;
 }
 
+public void updateDirection(boolean inputValue)
+{
+  if((keyCode == 87) || (keyCode == 38)) { up = inputValue; }
+  if((keyCode == 83) || (keyCode == 40)) { down = inputValue; }  
+  if((keyCode == 65) || (keyCode == 37)) { left = inputValue; }
+  if((keyCode == 68) || (keyCode == 39)) { right = inputValue; } 
+}
+
+public void playerMoves()
+{
+  if(up) { player.moveUp(); }
+  if(down) { player.moveDown(); }
+  if(left) { player.moveLeft(); }
+  if(right) { player.moveRight(); }
+}
+
+public void playerShoots()
+{
+  if(shooting)
+  { 
+    bulletArr.add(
+      new Bullet(player.playerX + player.playerSize / 2, 
+      player.playerY + player.playerSize / 2, 
+      mouseX, mouseY, 10, TargetType.MOBS));
+    shooting = false;
+  }
+}
+
 public void updateObsArr()
 {
   // rows * columns
@@ -57,15 +85,29 @@ public void updateMobsGridArray()
 public void updateMobsArray()
 {
   mobArr = new ArrayList<Mob> ();
-  for(MobData thisMobData: mobData[currentRow][currentColumn])
+  MobData[] thisMobsData = mobData[currentRow][currentColumn];
+  if(thisMobsData != null)
   {
-    mobArr.add(new Mob(thisMobData));
+    for(MobData thisMobData: thisMobsData)
+    {
+      mobArr.add(new Mob(thisMobData));
+    }
   }
 }
 
 public void clearDeadMobs()
 {
-  mobArr.removeIf(mob -> mob.isDead());
+  if(mobArr.size() != 0)
+  {
+    mobArr.removeIf(mob -> mob.isDead());
+    if(mobArr.size() == 0) { roomCleared(); }
+  }
+}
+
+public void roomCleared()
+{
+  mobData[currentRow][currentColumn] = null;
+  player.addPlayerHealth(17);
 }
 
 public void clearHitBullets()
@@ -158,13 +200,16 @@ public void tmpDisplayRoomInformation()
   text("Current Row: "+currentRow+"; Current Column: "+currentColumn
       +"; RoomValue: "+roomDisData[currentRow][currentColumn], 35, 100);
   textSize(20);
-  for(int i=0; i < mobData[currentRow][currentColumn].length; i++)
+  if(mobData[currentRow][currentColumn] != null)
   {
-    MobData thisMob = mobData[currentRow][currentColumn][i];
-    text(i +
-        ": Row: "+ thisMob.getMobRow() +
-        ", Column: "+ thisMob.getMobColumn() +
-        ", Health: "+ thisMob.getMobHealth(), 60, 150+i*25);
+    for(int i=0; i < mobData[currentRow][currentColumn].length; i++)
+    {
+      MobData thisMob = mobData[currentRow][currentColumn][i];
+      text(i +
+          ": Row: "+ thisMob.getMobRow() +
+          ", Column: "+ thisMob.getMobColumn() +
+          ", Health: "+ thisMob.getMobHealth(), 60, 150+i*25);
+    }
   }
   for(int i=0; i < obsData[currentRow][currentColumn].length; i++)
   {

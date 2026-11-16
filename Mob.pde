@@ -8,7 +8,7 @@ public class Mob
 {
   private float mobX=0, mobY=0, mobSize=0;
   private float speed=2;
-  private int mobType=0, mobHealth=0, randSeed=0;
+  private int mobType=0, mobHealth=0, initMobHealth=0, randSeed=0;
   private int preRow=0, preColumn=0, attackCooldown=0;
   private ArrayList<int[]> path = new ArrayList<>(),
     originalPath = new ArrayList<>();
@@ -18,7 +18,8 @@ public class Mob
   {
     this.mobX = mobdata.getMobColumn() * gridSize;
     this.mobY = mobdata.getMobRow() * gridSize;
-    this.mobHealth = mobdata.getMobHealth();
+    this.initMobHealth = mobdata.getMobHealth();
+    this.mobHealth = initMobHealth;
     this.mobSize = gridSize;
     this.randSeed = rand.nextInt(24);
     updatePath();
@@ -153,7 +154,9 @@ public class Mob
     {
       bulletArr.add(
       new Bullet(mobX + mobSize / 2,  mobY + mobSize / 2, 
-        player.playerX, player.playerY, 10, TargetType.PLAYER));
+        player.playerX + player.getPlayerSize() / 2,
+        player.playerY + player.getPlayerSize() / 2,
+        10, TargetType.PLAYER));
         attackCooldown = 120;
     }
   }
@@ -382,6 +385,17 @@ public class Mob
     fill(255);
     textSize(14);
     text("HP: "+mobHealth+" Type:"+mobType, mobX, mobY - 5);
+    displayHealthPointBar();
+  }
+  
+  private void displayHealthPointBar()
+  {
+    fill(#58090A);
+    rect(mobX - 5, mobY - gridSize / 5 - 5,
+      gridSize + 10, gridSize / 5);
+    fill(#E8070B);
+    rect(mobX, mobY - gridSize / 5 - 1,
+      gridSize * ((float)mobHealth / initMobHealth), gridSize / 10);
   }
   
   public boolean isDead() { return mobHealth <= 0; }
