@@ -2,6 +2,15 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.lang.IndexOutOfBoundsException;
 import java.util.Comparator;
+import java.util.Random;
+
+public final int[] U = {-1, 0}, D = {1, 0}, L = {0, -1}, R = {0, 1};
+
+public final int[][][] directions =
+  {{U, D, L, R}, {U, D, R, L}, {U, L, D, R}, {U, L, R, D}, {U, R, D, L}, {U, R, L, D},
+  {D, U, L, R}, {D, U, R, L}, {D, L, U, R}, {D, L, R, U}, {D, R, U, L}, {D, R, L, U},
+  {L, U, D, R}, {L, U, R, D}, {L, D, U, R}, {L, D, R, U}, {L, R, U, D}, {L, R, D, U},
+  {R, U, D, L}, {R, U, L, D}, {R, D, U, L}, {R, D, L, U}, {R, L, U, D}, {R, L, D, U}};
 
 public static <T> T[] appendTo(T[] oldArr, T item)
 {
@@ -31,6 +40,18 @@ public boolean isObstacle(int thisRow, int thisColumn)
   else { return obsArr[thisRow * columns + thisColumn]; }
 }
 
+public void updateMobsGridArray()
+{
+  mobGridArr = new ArrayList[rows * columns];
+  for(int i = 0; i < mobGridArr.length; i++) { mobGridArr[i] = new ArrayList<Mob>(); }
+  for(Mob mob: mobArr)
+  {
+    int mobRow = max((int)((mob.getMobY() + gridSize / 2) / gridSize) - 1, 0),
+       mobColumn = max((int)((mob.getMobX() + gridSize / 2) / gridSize) - 1, 0);
+    mobGridArr[mobRow * columns + mobColumn].add(mob);
+  }
+}
+
 public void updateMobsArray()
 {
   mobArr = new ArrayList<Mob> ();
@@ -45,6 +66,29 @@ public void clearDeadMobs()
   mobArr.removeIf(mob -> mob.isDead());
 }
 
+public void clearHitBullets()
+{
+  bulletArr.removeIf(bullet -> bullet.hasHitObject());
+}
+
+public void mobsMove()
+{
+  for(Mob thisMob: mobArr)
+  {
+    thisMob.move();
+    if(!thisMob.isInSameGrid())
+    {
+      int preMobRow = thisMob.getPreRow(),
+        preMobColumn = thisMob.getPreColumn(),
+        curMobRow = max((int)((thisMob.getMobY() + gridSize / 2) / gridSize) - 1, 0),
+        curMobColumn = max((int)((thisMob.getMobX() + gridSize / 2) / gridSize) - 1, 0);
+      mobGridArr[preMobRow * columns + preMobColumn].remove(thisMob);
+      mobGridArr[curMobRow * columns + curMobColumn].add(thisMob);
+      thisMob.updateRC();
+    }
+  }
+}
+
 public void renderMobs()
 {
   int d=0;
@@ -57,6 +101,27 @@ public void renderMobs()
       +"\nTargetRC: ("+thisTargetRow+", "+thisTargetColumn+")", 300, d * 100 + 300);
     d += 1;
   }
+}
+
+public void updateBulletsArray()
+{
+  bulletArr.clear(); 
+}
+
+public void bulletsMove()
+{
+  for(Bullet thisBullet: bulletArr)
+  {
+    thisBullet.move();
+  }
+}
+
+public void renderBullets()
+{
+   for(Bullet thisBullet: bulletArr)
+   {
+     thisBullet.renderBullet(); 
+   }
 }
   
 public void initializeImages()
@@ -110,34 +175,38 @@ public void tmpDisplayRoomInformation()
 
 public boolean hasTopRoom()
 {
-  boolean topRoomExist = true;
-  try { if(roomDisData[currentRow - 1][currentColumn] == -1) { topRoomExist = false; } }
-  catch(IndexOutOfBoundsException e) { topRoomExist = false; }
-  return topRoomExist;
+  if(currentRow - 1 < 0) { return false; }
+  else if(roomDisData[currentRow - 1][currentColumn] == -1
+    || (roomDisData[currentRow - 1][currentColumn] == 67 
+    && roomDisData[currentRow][currentColumn] % 10 != 3)) { return false; }
+  return true;
 }
 
 public boolean hasBottomRoom()
 {
-  boolean bottomRoomExist = true;
-  try { if(roomDisData[currentRow + 1][currentColumn] == -1) { bottomRoomExist = false; } }
-  catch(IndexOutOfBoundsException e) { bottomRoomExist = false; }
-  return bottomRoomExist;
+  if(currentRow + 1 > 4) { return false; }
+  else if(roomDisData[currentRow + 1][currentColumn] == -1
+    || (roomDisData[currentRow + 1][currentColumn] == 67 
+    && roomDisData[currentRow][currentColumn] % 10 != 3)) { return false; }
+  return true;
 }
 
 public boolean hasLeftRoom()
 {
-  boolean leftRoomExist = true;
-  try { if(roomDisData[currentRow][currentColumn - 1] == -1) { leftRoomExist = false; } }
-  catch(IndexOutOfBoundsException e) { leftRoomExist = false; }
-  return leftRoomExist;
+  if(currentColumn - 1 < 0) { return false; }
+  else if(roomDisData[currentRow][currentColumn - 1] == -1
+    || (roomDisData[currentRow][currentColumn - 1] == 67 
+    && roomDisData[currentRow][currentColumn] % 10 != 3)) { return false; }
+  return true;
 }
 
 public boolean hasRightRoom()
 {
-  boolean rightRoomExist = true;
-  try { if(roomDisData[currentRow][currentColumn + 1] == -1) { rightRoomExist = false; } }
-  catch(IndexOutOfBoundsException e) { rightRoomExist = false; }
-  return rightRoomExist;
+  if(currentColumn + 1 > 4) { return false; }
+  else if(roomDisData[currentRow][currentColumn + 1] == -1
+    || (roomDisData[currentRow][currentColumn + 1] == 67 
+    && roomDisData[currentRow][currentColumn] % 10 != 3)) { return false; }
+  return true;
 }
 
 public void renderBackground()
@@ -176,12 +245,21 @@ public void renderObstacles()
   }
 }
 
+public boolean isTeleportRoom() { return roomDisData[currentRow][currentColumn] == 67; }
+
+public void teleportToSpawn()
+{
+  currentRow = 2;
+  currentColumn = 2;
+  updateAllArrays();
+}
+
 public void enterTopPortal()
 {
   if(hasTopRoom())
   { 
     currentRow -= 1;
-    updateMobsArray();
+    updateAllArrays();
   }
 }
 public void enterBottomPortal()
@@ -189,7 +267,7 @@ public void enterBottomPortal()
   if(hasBottomRoom())
   { 
     currentRow += 1;
-    updateMobsArray();
+    updateAllArrays();
   }
 }
 public void enterLeftPortal()
@@ -197,7 +275,7 @@ public void enterLeftPortal()
   if(hasLeftRoom())
   { 
     currentColumn -= 1;
-    updateMobsArray();
+    updateAllArrays();
   }
 }
 public void enterRightPortal()
@@ -205,6 +283,14 @@ public void enterRightPortal()
   if(hasRightRoom())
   { 
     currentColumn += 1;
-    updateMobsArray();
+    updateAllArrays();
   }
+}
+
+public void updateAllArrays()
+{
+  updateObsArr();
+  updateMobsArray();
+  updateMobsGridArray();
+  updateBulletsArray();
 }
