@@ -12,6 +12,8 @@ public final int[][][] directions =
   {L, U, D, R}, {L, U, R, D}, {L, D, U, R}, {L, D, R, U}, {L, R, U, D}, {L, R, D, U},
   {R, U, D, L}, {R, U, L, D}, {R, D, U, L}, {R, D, L, U}, {R, L, U, D}, {R, L, D, U}};
 
+enum TargetType {PLAYER, MOBS};
+
 public static <T> T[] appendTo(T[] oldArr, T item)
 {
   T[] newArr = Arrays.copyOf(oldArr, oldArr.length + 1);
@@ -86,6 +88,7 @@ public void mobsMove()
       mobGridArr[curMobRow * columns + curMobColumn].add(thisMob);
       thisMob.updateRC();
     }
+    thisMob.addAttackCooldown(-1);
   }
 }
 

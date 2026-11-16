@@ -52,6 +52,7 @@ void draw()
   renderDoors();
   renderObstacles();
   
+  if(player.isDead()) { println("Game Over"); }
   player.renderPlayer();
   
   clearDeadMobs();
@@ -77,5 +78,6 @@ void mouseClicked()
 {
   bulletArr.add(
     new Bullet(player.playerX + player.playerSize / 2, 
-      player.playerY + player.playerSize / 2, mouseX, mouseY, 10));
+      player.playerY + player.playerSize / 2, 
+      mouseX, mouseY, 10, TargetType.MOBS));
 }

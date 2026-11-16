@@ -2,11 +2,13 @@ public class Bullet
 {
   private float bulletX=0, bulletY=0;
   private float stepX=0, stepY=0;
-  private float speed=5, bulletSize=8;
+  private float speed=15, bulletSize=20;
   private int bulletDamage=0;
+  private TargetType targetType;
   private boolean hasHit=false;
 
-  public Bullet(float spawnX, float spawnY, float targetX, float targetY, int inputDamage)
+  public Bullet(float spawnX, float spawnY, float targetX, float targetY, 
+    int inputDamage, TargetType inputTargetType)
   {
     this.bulletX = spawnX;
     this.bulletY = spawnY;
@@ -15,6 +17,7 @@ public class Bullet
     float d = dist(spawnX, spawnY, targetX, targetY);
     this.stepX = speed * ((targetX - spawnX) / d);
     this.stepY = speed * ((targetY - spawnY) / d);
+    this.targetType = inputTargetType;
   }
 
   private void move()
@@ -33,12 +36,17 @@ public class Bullet
   
   private void damageTargets()
   {
+    if(targetType == TargetType.MOBS) { damageMobs(); }
+    else { damagePlayer(); }
+  }
+  
+  private void damageMobs()
+  {
     int curRow = max((int)(bulletY / gridSize) - 1, 0),
       curColumn = max((int)(bulletX / gridSize) - 1, 0);
       
     ArrayList<Mob> checkList = new ArrayList<Mob>();
     checkList.addAll(mobGridArr[curRow * columns + curColumn]);
-    //indexOutOfRange, check later
     if(stepX != 0)
     {
       int horizontalIndex = curColumn + (int)Math.signum(stepX) * -1;
@@ -78,17 +86,21 @@ public class Bullet
     }
   }
   
+  private void damagePlayer()
+  {
+    if(isOnTrajectory(bulletX, bulletY,
+        player.getPlayerX() + gridSize / 2, player.getPlayerY() + gridSize / 2))
+    {
+      player.addPlayerHealth(bulletDamage * -1);
+      hasHit = true;
+    }
+  }
+  
   private void obsDetection()
   {
     int curRow = (int)(bulletY / gridSize),
       curColumn = (int)(bulletX / gridSize);
-    if(isObstacle(curRow, curColumn) /*||
-      isObstacle(curRow + (int)Math.signum(stepY), curColumn) ||
-      isObstacle(curRow, curColumn + (int)Math.signum(stepX)) ||
-      isObstacle(curRow + (int)Math.signum(stepY), curColumn + (int)Math.signum(stepX))*/)
-    {
-      hasHit = true;
-    }
+    if(isObstacle(curRow, curColumn)) { hasHit = true; }
   }
   
   private boolean isOnTrajectory(float aX, float aY, float pX, float pY)
@@ -97,7 +109,8 @@ public class Bullet
     float t = (stepX * apX + stepY * apY) / (stepX * stepX + stepY * stepY);
     if(t > 1) { return false; }
     float dX = apX - t * stepX, dY = apY - t * stepY;
-    return (dX * dX + dY * dY) <= (gridSize * 0.7071) * (gridSize * 0.7071);
+    return (dX * dX + dY * dY) <= 
+      (gridSize * 0.7071) * (gridSize * 0.7071) + bulletSize / 2;
   }
 
   public void renderBullet()

@@ -3,6 +3,7 @@ public class Player
 {
   private float playerX=0, playerY=0, playerSize=0;
   private float speed = 10;
+  private int playerHealth = 100;
   private int preRow = 0, preColumn = 0, distLimit = 3;
   // we can consider doing acceleration to get smoother movement?
   
@@ -161,10 +162,14 @@ public class Player
   public void renderPlayer()
   {
     // should do image(charcterTiles[i], playerX, playerY, playerSize, playerSize); here.
-    // using rect() as tmp rendering object.
+    // using rect() as tmp rendering object. 
     noStroke();
     fill(#F72A2A);
     rect(playerX, playerY, playerSize, playerSize);
+    // tmp hp bar
+    fill(255);
+    textSize(14);
+    text("HP: "+playerHealth, playerX, playerY - 5);
   }
   
   private void updateMobsPath()
@@ -175,6 +180,8 @@ public class Player
     }
   }
   
+  public boolean isDead() { return playerHealth <= 0; }
+  
   public float getPlayerX() { return playerX; }
   public float getPlayerY() { return playerY; }
   public float getPlayerSize() { return playerSize; }
@@ -184,4 +191,5 @@ public class Player
     this.playerX = width / 2 - playerSize / 2;
     this.playerY = height / 2 - playerSize / 2;
   }
+  public void addPlayerHealth(int inputValue) { this.playerHealth += inputValue; }
 }

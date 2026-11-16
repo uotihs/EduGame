@@ -9,7 +9,7 @@ public class Mob
   private float mobX=0, mobY=0, mobSize=0;
   private float speed=2;
   private int mobType=0, mobHealth=0, randSeed=0;
-  private int preRow=0, preColumn=0;
+  private int preRow=0, preColumn=0, attackCooldown=0;
   private ArrayList<int[]> path = new ArrayList<>(),
     originalPath = new ArrayList<>();
   private boolean preCanSee = true;
@@ -31,8 +31,8 @@ public class Mob
       preCanSee = true;
       float minDistance = gridSize * 2;
       float distance = dist(mobX, mobY, player.getPlayerX(), player.getPlayerY());
+      attackPlayer(); 
       if(distance > minDistance) { chasePlayer(); }
-      else { attackPlayer(); }
     }
     else
     {
@@ -148,8 +148,14 @@ public class Mob
   
   private void attackPlayer()
   {
-    //haven't decided how to write this part.
-    text("Attack!", mobX, mobY - 10);
+    //text("Attack!", mobX, mobY - 10);
+    if(attackCooldown == 0)
+    {
+      bulletArr.add(
+      new Bullet(mobX + mobSize / 2,  mobY + mobSize / 2, 
+        player.playerX, player.playerY, 10, TargetType.PLAYER));
+        attackCooldown = 120;
+    }
   }
   
   private void walkTowardWaypoint()
@@ -371,11 +377,11 @@ public class Mob
     // using rect() as tmp rendering object.
     noStroke();
     fill(#F72A2A);
-    rect(this.mobX, this.mobY, mobSize, mobSize);
+    rect(mobX, mobY, mobSize, mobSize);
     //tmp hp bar.
     fill(255);
     textSize(14);
-    text("HP: "+mobHealth, this.mobX, this.mobY - 5);
+    text("HP: "+mobHealth+" Type:"+mobType, mobX, mobY - 5);
   }
   
   public boolean isDead() { return mobHealth <= 0; }
@@ -387,4 +393,8 @@ public class Mob
   public int getPreColumn() { return preColumn; }
   
   public void addMobHealth(int inputValue) { this.mobHealth += inputValue; }
+  public void addAttackCooldown(int inputValue)
+  { 
+    this.attackCooldown = max(attackCooldown + inputValue, 0);
+  }
 }
