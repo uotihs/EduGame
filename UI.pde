@@ -81,7 +81,7 @@ public class Button{
         if(onit)fill(#D8D8D8);
         if(pressed)fill(#5D5C5C);
         rectMode(CENTER);
-        rect(centerx,centery,this.width1,this.height1);
+        rect(this.centerx,this.centery,this.width1,this.height1);
         
         if(word!=null)
         {
@@ -176,7 +176,7 @@ public class SliderBar
     pushStyle(); // this func stores the outer style and do its
 
     strokeWeight(6);
-    stroke(200);
+    stroke(255);
     line(left, centery, right, centery);
     stroke(#5588CC);
     line(left, centery, knobX, centery);
