@@ -134,6 +134,11 @@ public void initializeImages()
   {
     tiles[i] = spritesheet.get(tileSize * i, 0, tileSize, tileSize); 
   }
+  //## 載入四個等級的武器 PNG 圖片 (放置於 data/images/ 資料夾下)
+  for(int i=0; i < weaponImgs.length; i++)
+  {
+    weaponImgs[i] = loadImage("images/weapon_lv" + (i + 1) + ".png");
+  }
 }
 
 public void tmpPrintRoomDisData()

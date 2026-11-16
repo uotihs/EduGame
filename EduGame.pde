@@ -11,12 +11,14 @@ Random rand = new Random();
 float gridSize;
 int currentRow = 2, currentColumn = 2;
 Player player;
+PlayerWeapon weapon; //##
 ArrayList<Mob> mobArr;
 ArrayList<Mob>[] mobGridArr;
 ArrayList<Bullet> bulletArr = new ArrayList<Bullet>();
 
 PImage backgroundImage;
 PImage[] tiles = new PImage[11];
+PImage[] weaponImgs = new PImage[4]; //## 存放 Lv.1 ~ Lv.4 的四張武器 PNG
 
 void setup()
 {
@@ -53,6 +55,7 @@ void draw()
   renderObstacles();
   
   player.renderPlayer();
+  weapon.renderWeapon();//##
   
   clearDeadMobs();
   mobsMove();
