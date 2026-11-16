@@ -12,6 +12,8 @@ float gridSize;
 int currentRow = 2, currentColumn = 2;
 Player player;
 ArrayList<Mob> mobArr;
+ArrayList<Mob>[] mobGridArr;
+ArrayList<Bullet> bulletArr = new ArrayList<Bullet>();
 
 PImage backgroundImage;
 PImage[] tiles = new PImage[11];
@@ -28,8 +30,7 @@ void setup()
   obsData = mapData.obsData;
   saver.saveIntoData(mapData);
   
-  updateObsArr();
-  updateMobsArray();
+  updateAllArrays();
 
   initializeImages();
   
@@ -50,13 +51,17 @@ void draw()
   renderBackground();
   renderDoors();
   renderObstacles();
+  
   player.renderPlayer();
+  
   clearDeadMobs();
-  for(Mob thisMob: mobArr)
-  {
-    thisMob.move();
-  }
+  mobsMove();
   renderMobs();
+  
+  clearHitBullets();
+  bulletsMove();
+  renderBullets();
+  
   tmpDisplayRoomInformation();
 }
 
@@ -66,4 +71,11 @@ void keyPressed()
   if((keyCode == 83) || (keyCode == 40)) { player.moveDown(); }  
   if((keyCode == 65) || (keyCode == 37)) { player.moveLeft(); }
   if((keyCode == 68) || (keyCode == 39)) { player.moveRight(); }
+}
+
+void mouseClicked()
+{
+  bulletArr.add(
+    new Bullet(player.playerX + player.playerSize / 2, 
+      player.playerY + player.playerSize / 2, mouseX, mouseY, 10));
 }

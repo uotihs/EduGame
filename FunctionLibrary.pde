@@ -40,6 +40,18 @@ public boolean isObstacle(int thisRow, int thisColumn)
   else { return obsArr[thisRow * columns + thisColumn]; }
 }
 
+public void updateMobsGridArray()
+{
+  mobGridArr = new ArrayList[rows * columns];
+  for(int i = 0; i < mobGridArr.length; i++) { mobGridArr[i] = new ArrayList<Mob>(); }
+  for(Mob mob: mobArr)
+  {
+    int mobRow = max((int)((mob.getMobY() + gridSize / 2) / gridSize) - 1, 0),
+       mobColumn = max((int)((mob.getMobX() + gridSize / 2) / gridSize) - 1, 0);
+    mobGridArr[mobRow * columns + mobColumn].add(mob);
+  }
+}
+
 public void updateMobsArray()
 {
   mobArr = new ArrayList<Mob> ();
@@ -54,6 +66,29 @@ public void clearDeadMobs()
   mobArr.removeIf(mob -> mob.isDead());
 }
 
+public void clearHitBullets()
+{
+  bulletArr.removeIf(bullet -> bullet.hasHitObject());
+}
+
+public void mobsMove()
+{
+  for(Mob thisMob: mobArr)
+  {
+    thisMob.move();
+    if(!thisMob.isInSameGrid())
+    {
+      int preMobRow = thisMob.getPreRow(),
+        preMobColumn = thisMob.getPreColumn(),
+        curMobRow = max((int)((thisMob.getMobY() + gridSize / 2) / gridSize) - 1, 0),
+        curMobColumn = max((int)((thisMob.getMobX() + gridSize / 2) / gridSize) - 1, 0);
+      mobGridArr[preMobRow * columns + preMobColumn].remove(thisMob);
+      mobGridArr[curMobRow * columns + curMobColumn].add(thisMob);
+      thisMob.updateRC();
+    }
+  }
+}
+
 public void renderMobs()
 {
   int d=0;
@@ -66,6 +101,27 @@ public void renderMobs()
       +"\nTargetRC: ("+thisTargetRow+", "+thisTargetColumn+")", 300, d * 100 + 300);
     d += 1;
   }
+}
+
+public void updateBulletsArray()
+{
+  bulletArr.clear(); 
+}
+
+public void bulletsMove()
+{
+  for(Bullet thisBullet: bulletArr)
+  {
+    thisBullet.move();
+  }
+}
+
+public void renderBullets()
+{
+   for(Bullet thisBullet: bulletArr)
+   {
+     thisBullet.renderBullet(); 
+   }
 }
   
 public void initializeImages()
@@ -235,4 +291,6 @@ public void updateAllArrays()
 {
   updateObsArr();
   updateMobsArray();
+  updateMobsGridArray();
+  updateBulletsArray();
 }

@@ -9,6 +9,7 @@ public class Mob
   private float mobX=0, mobY=0, mobSize=0;
   private float speed=2;
   private int mobType=0, mobHealth=0, randSeed=0;
+  private int preRow=0, preColumn=0;
   private ArrayList<int[]> path = new ArrayList<>(),
     originalPath = new ArrayList<>();
   private boolean preCanSee = true;
@@ -323,7 +324,7 @@ public class Mob
     return smoothPath(path);
   }
   
-  ArrayList<int[]> smoothPath(ArrayList<int[]> p)
+  private ArrayList<int[]> smoothPath(ArrayList<int[]> p)
   {
     if(p.size() <= 1) return p;
 
@@ -351,6 +352,18 @@ public class Mob
     }
     return smoothedPath;
   }
+  
+  public boolean isInSameGrid()
+  {
+    int curRow = max((int)(mobY + gridSize / 2) - 1, 0),
+      curColumn = max((int)(mobX + gridSize / 2) - 1, 0);
+    return curRow == preRow && curColumn == preColumn;
+  }
+  public void updateRC()
+  {
+    preRow = max((int)((mobY + gridSize / 2) / gridSize) - 1, 0);
+    preColumn = max((int)((mobX + gridSize / 2) / gridSize) - 1, 0);
+  }
 
   public void renderMob()
   {
@@ -370,6 +383,8 @@ public class Mob
   public float getMobX() { return mobX; }
   public float getMobY() { return mobY; }
   public int getMobHealth() { return mobHealth; }
+  public int getPreRow() { return preRow; }
+  public int getPreColumn() { return preColumn; }
   
   public void addMobHealth(int inputValue) { this.mobHealth += inputValue; }
 }
