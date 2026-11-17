@@ -172,6 +172,11 @@ public void initializeImages()
   {
     tiles[i] = spritesheet.get(tileSize * i, 0, tileSize, tileSize); 
   }
+  
+  for(int i=0; i < weaponImgs.length; i++)
+  {
+    weaponImgs[i] = loadImage("images/weapon_lv" + (i + 1) + ".png");
+  }
 }
 
 public void tmpPrintRoomDisData()

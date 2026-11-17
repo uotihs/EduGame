@@ -12,6 +12,7 @@ Random rand = new Random();
 float gridSize;
 int currentRow = 2, currentColumn = 2;
 Player player;
+PlayerWeapon weapon;
 boolean up = false, down = false,
   left = false, right = false, shooting = false;
   
@@ -21,6 +22,7 @@ ArrayList<Bullet> bulletArr = new ArrayList<Bullet>();
 
 PImage backgroundImage;
 PImage[] tiles = new PImage[11];
+PImage[] weaponImgs = new PImage[4];
 
 void setup()
 {
@@ -44,6 +46,7 @@ void setup()
   gridSize = width / 11;
 
   player = new Player();
+  weapon = new PlayerWeapon();
   //mobData[2][3] = appendTo(mobData[2][3], new MobData(4, 8));
   //obsData[2][1] = appendTo(obsData[2][1], new ObstacleData(8, 5, 0));
   //saver.saveIntoData(mapData);
@@ -60,6 +63,7 @@ void draw()
   player.shoot();
   player.updateReloadTimer();
   player.renderPlayer();
+  weapon.renderWeapon();
   
   mobsMove();
   clearDeadMobs();
