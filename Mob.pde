@@ -22,6 +22,7 @@ public class Mob
     this.mobHealth = initMobHealth;
     this.mobSize = gridSize;
     this.randSeed = rand.nextInt(24);
+    updateRC();
     updatePath();
   }
 
