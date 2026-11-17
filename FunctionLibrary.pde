@@ -12,11 +12,22 @@ public final int[][][] directions =
   {L, U, D, R}, {L, U, R, D}, {L, D, U, R}, {L, D, R, U}, {L, R, U, D}, {L, R, D, U},
   {R, U, D, L}, {R, U, L, D}, {R, D, U, L}, {R, D, L, U}, {R, L, U, D}, {R, L, D, U}};
 
+enum TargetType {PLAYER, MOBS};
+
 public static <T> T[] appendTo(T[] oldArr, T item)
 {
   T[] newArr = Arrays.copyOf(oldArr, oldArr.length + 1);
   newArr[newArr.length-1] = item;
   return newArr;
+}
+
+public void updateDirection(boolean inputValue)
+{
+  if((keyCode == 87) || (keyCode == 38)) { up = inputValue; }
+  if((keyCode == 83) || (keyCode == 40)) { down = inputValue; } 
+  if((keyCode == 65) || (keyCode == 37)) { left = inputValue; }
+  if((keyCode == 68) || (keyCode == 39)) { right = inputValue; }
+  if(keyCode == 82) { player.reload(); }
 }
 
 public void updateObsArr()
@@ -55,15 +66,40 @@ public void updateMobsGridArray()
 public void updateMobsArray()
 {
   mobArr = new ArrayList<Mob> ();
-  for(MobData thisMobData: mobData[currentRow][currentColumn])
+  MobData[] thisMobsData = mobData[currentRow][currentColumn];
+  if(thisMobsData != null)
   {
-    mobArr.add(new Mob(thisMobData));
+    for(MobData thisMobData: thisMobsData)
+    {
+      mobArr.add(new Mob(thisMobData));
+    }
   }
+  clearDeadMobs();
 }
 
 public void clearDeadMobs()
 {
-  mobArr.removeIf(mob -> mob.isDead());
+  if(mobArr.size() != 0)
+  {
+    mobArr.removeIf(mob -> 
+    {
+      if(mob.isDead())
+      {
+        int curMobRow = max((int)((mob.getMobY() + gridSize / 2) / gridSize) - 1, 0),
+          curMobColumn = max((int)((mob.getMobX() + gridSize / 2) / gridSize) - 1, 0);
+        mobGridArr[curMobRow * columns + curMobColumn].remove(mob);
+        return true;
+      }
+      return false;
+    });
+    if(mobArr.size() == 0) { roomCleared(); }
+  }
+}
+
+public void roomCleared()
+{
+  mobData[currentRow][currentColumn] = null;
+  player.addPlayerHealth(20);
 }
 
 public void clearHitBullets()
@@ -86,20 +122,22 @@ public void mobsMove()
       mobGridArr[curMobRow * columns + curMobColumn].add(thisMob);
       thisMob.updateRC();
     }
+    thisMob.addAttackCooldown(-1);
   }
 }
 
 public void renderMobs()
 {
-  int d=0;
+  //int d=0;
   for(Mob thisMob: mobArr)
   {
     thisMob.renderMob();
+    /*
     float thisTargetRow = thisMob.path.get(0)[0],
       thisTargetColumn = thisMob.path.get(0)[1];
     text("mobX: "+thisMob.getMobX()+" mobY: "+thisMob.getMobY()+" hp: "+thisMob.getMobHealth()
       +"\nTargetRC: ("+thisTargetRow+", "+thisTargetColumn+")", 300, d * 100 + 300);
-    d += 1;
+    d += 1; */
   }
 }
 
@@ -134,10 +172,10 @@ public void initializeImages()
   {
     tiles[i] = spritesheet.get(tileSize * i, 0, tileSize, tileSize); 
   }
-  //## 載入四個等級的武器 PNG 圖片 (放置於 data/images/ 資料夾下)
+  
   for(int i=0; i < weaponImgs.length; i++)
   {
-    weaponImgs[i] = loadImage("data/images/weapon_lv" + (i + 1) + ".png");
+    weaponImgs[i] = loadImage("images/weapon_lv" + (i + 1) + ".png");
   }
 }
 
@@ -160,13 +198,16 @@ public void tmpDisplayRoomInformation()
   text("Current Row: "+currentRow+"; Current Column: "+currentColumn
       +"; RoomValue: "+roomDisData[currentRow][currentColumn], 35, 100);
   textSize(20);
-  for(int i=0; i < mobData[currentRow][currentColumn].length; i++)
+  if(mobData[currentRow][currentColumn] != null)
   {
-    MobData thisMob = mobData[currentRow][currentColumn][i];
-    text(i +
-        ": Row: "+ thisMob.getMobRow() +
-        ", Column: "+ thisMob.getMobColumn() +
-        ", Health: "+ thisMob.getMobHealth(), 60, 150+i*25);
+    for(int i=0; i < mobData[currentRow][currentColumn].length; i++)
+    {
+      MobData thisMob = mobData[currentRow][currentColumn][i];
+      text(i +
+          ": Row: "+ thisMob.getMobRow() +
+          ", Column: "+ thisMob.getMobColumn() +
+          ", Health: "+ thisMob.getMobHealth(), 60, 150+i*25);
+    }
   }
   for(int i=0; i < obsData[currentRow][currentColumn].length; i++)
   {

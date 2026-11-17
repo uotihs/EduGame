@@ -5,20 +5,24 @@ MobData[][][] mobData;
 ObstacleData[][][] obsData;
 
 boolean[] obsArr;
-int rows = 7, columns = 9;
+final int rows = 7, columns = 9,
+  maxAmmos = 6, reloadDuration = 60;
 Random rand = new Random();
 
 float gridSize;
 int currentRow = 2, currentColumn = 2;
 Player player;
-PlayerWeapon weapon; //##
+PlayerWeapon weapon;
+boolean up = false, down = false,
+  left = false, right = false, shooting = false;
+  
 ArrayList<Mob> mobArr;
 ArrayList<Mob>[] mobGridArr;
 ArrayList<Bullet> bulletArr = new ArrayList<Bullet>();
 
 PImage backgroundImage;
 PImage[] tiles = new PImage[11];
-PImage[] weaponImgs = new PImage[4]; //## 存放 Lv.1 ~ Lv.4 的四張武器 PNG
+PImage[] weaponImgs = new PImage[4];
 
 void setup()
 {
@@ -42,8 +46,7 @@ void setup()
   gridSize = width / 11;
 
   player = new Player();
-  weapon = new PlayerWeapon();//##
-  
+  weapon = new PlayerWeapon();
   //mobData[2][3] = appendTo(mobData[2][3], new MobData(4, 8));
   //obsData[2][1] = appendTo(obsData[2][1], new ObstacleData(8, 5, 0));
   //saver.saveIntoData(mapData);
@@ -55,31 +58,24 @@ void draw()
   renderDoors();
   renderObstacles();
   
+  if(player.isDead()) { println("Game Over"); }
+  player.move();
+  player.shoot();
+  player.updateReloadTimer();
   player.renderPlayer();
-  weapon.renderWeapon();//##
+  weapon.renderWeapon();
   
-  clearDeadMobs();
   mobsMove();
+  clearDeadMobs();
   renderMobs();
   
-  clearHitBullets();
   bulletsMove();
+  clearHitBullets();
   renderBullets();
   
-  tmpDisplayRoomInformation();
+  //tmpDisplayRoomInformation();
 }
 
-void keyPressed()
-{
-  if((keyCode == 87) || (keyCode == 38)) { player.moveUp(); }
-  if((keyCode == 83) || (keyCode == 40)) { player.moveDown(); }  
-  if((keyCode == 65) || (keyCode == 37)) { player.moveLeft(); }
-  if((keyCode == 68) || (keyCode == 39)) { player.moveRight(); }
-}
-
-void mouseClicked()
-{
-  bulletArr.add(
-    new Bullet(player.playerX + player.playerSize / 2, 
-      player.playerY + player.playerSize / 2, mouseX, mouseY, 10));
-}
+void keyPressed() { updateDirection(true); }
+void keyReleased() { updateDirection(false); }
+void mousePressed() { shooting = true; }
