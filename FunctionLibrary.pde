@@ -71,10 +71,12 @@ public void updateMobsArray()
   {
     for(MobData thisMobData: thisMobsData)
     {
-      mobArr.add(new Mob(thisMobData));
+      if(thisMobData.getMobHealth() > 0)
+      {
+        mobArr.add(new Mob(thisMobData));
+      }
     }
   }
-  clearDeadMobs();
 }
 
 public void clearDeadMobs()
