@@ -36,6 +36,7 @@ public class Bullet
   
   private void damageTargets()
   {
+    if(stepX == 0 && stepY == 0) { return; }
     if(targetType == TargetType.MOBS) { damageMobs(); }
     else { damagePlayer(); }
   }
@@ -49,7 +50,7 @@ public class Bullet
     checkList.addAll(mobGridArr[curRow * columns + curColumn]);
     if(stepX != 0)
     {
-      int horizontalIndex = curColumn + (int)Math.signum(stepX) * -1;
+      int horizontalIndex = curColumn + (int)Math.signum(stepX);
       if(horizontalIndex > 0 && horizontalIndex < columns - 1)
       {
         checkList.addAll(mobGridArr[curRow * columns + horizontalIndex]);
@@ -57,7 +58,7 @@ public class Bullet
     }
     if(stepY != 0)
     {
-      int verticalIndex = curRow + (int)Math.signum(stepY) * -1;
+      int verticalIndex = curRow + (int)Math.signum(stepY);
       if(verticalIndex > 0 && verticalIndex < rows - 1)
       {
         checkList.addAll(mobGridArr[verticalIndex * columns + curColumn]);
@@ -65,8 +66,8 @@ public class Bullet
     }
     if(stepX != 0 && stepY != 0)
     {
-      int horizontalIndex = curColumn + (int)Math.signum(stepX) * -1,
-        verticalIndex = curRow + (int)Math.signum(stepY) * -1;
+      int horizontalIndex = curColumn + (int)Math.signum(stepX),
+        verticalIndex = curRow + (int)Math.signum(stepY);
       if(horizontalIndex > 0 && horizontalIndex < columns - 1
         && verticalIndex > 0 && verticalIndex < rows - 1)
       {
@@ -80,6 +81,7 @@ public class Bullet
         mob.getMobX() + gridSize / 2, mob.getMobY() + gridSize / 2))
       {
         mob.addMobHealth(bulletDamage * -1);
+        println("Hit mob at ("+bulletX+", "+bulletY+")");
         hasHit = true;
         break;
       }
@@ -110,7 +112,7 @@ public class Bullet
     if(t > 1) { return false; }
     float dX = apX - t * stepX, dY = apY - t * stepY;
     return (dX * dX + dY * dY) <= 
-      (gridSize * 0.7071) * (gridSize * 0.7071) + bulletSize / 2;
+      (gridSize * 0.7071 + bulletSize / 2 ) * (gridSize * 0.7071 + bulletSize / 2);
   }
 
   public void renderBullet()

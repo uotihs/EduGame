@@ -24,29 +24,10 @@ public static <T> T[] appendTo(T[] oldArr, T item)
 public void updateDirection(boolean inputValue)
 {
   if((keyCode == 87) || (keyCode == 38)) { up = inputValue; }
-  if((keyCode == 83) || (keyCode == 40)) { down = inputValue; }  
+  if((keyCode == 83) || (keyCode == 40)) { down = inputValue; } 
   if((keyCode == 65) || (keyCode == 37)) { left = inputValue; }
-  if((keyCode == 68) || (keyCode == 39)) { right = inputValue; } 
-}
-
-public void playerMoves()
-{
-  if(up) { player.moveUp(); }
-  if(down) { player.moveDown(); }
-  if(left) { player.moveLeft(); }
-  if(right) { player.moveRight(); }
-}
-
-public void playerShoots()
-{
-  if(shooting)
-  { 
-    bulletArr.add(
-      new Bullet(player.playerX + player.playerSize / 2, 
-      player.playerY + player.playerSize / 2, 
-      mouseX, mouseY, 10, TargetType.MOBS));
-    shooting = false;
-  }
+  if((keyCode == 68) || (keyCode == 39)) { right = inputValue; }
+  if(keyCode == 82) { player.reload(); }
 }
 
 public void updateObsArr()
@@ -107,7 +88,7 @@ public void clearDeadMobs()
 public void roomCleared()
 {
   mobData[currentRow][currentColumn] = null;
-  player.addPlayerHealth(17);
+  player.addPlayerHealth(20);
 }
 
 public void clearHitBullets()
@@ -136,15 +117,16 @@ public void mobsMove()
 
 public void renderMobs()
 {
-  int d=0;
+  //int d=0;
   for(Mob thisMob: mobArr)
   {
     thisMob.renderMob();
+    /*
     float thisTargetRow = thisMob.path.get(0)[0],
       thisTargetColumn = thisMob.path.get(0)[1];
     text("mobX: "+thisMob.getMobX()+" mobY: "+thisMob.getMobY()+" hp: "+thisMob.getMobHealth()
       +"\nTargetRC: ("+thisTargetRow+", "+thisTargetColumn+")", 300, d * 100 + 300);
-    d += 1;
+    d += 1; */
   }
 }
 

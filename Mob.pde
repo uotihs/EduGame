@@ -381,10 +381,6 @@ public class Mob
     noStroke();
     fill(#F72A2A);
     rect(mobX, mobY, mobSize, mobSize);
-    //tmp hp bar.
-    fill(255);
-    textSize(14);
-    text("HP: "+mobHealth+" Type:"+mobType, mobX, mobY - 5);
     displayHealthPointBar();
   }
   

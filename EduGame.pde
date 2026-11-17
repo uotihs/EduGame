@@ -5,14 +5,15 @@ MobData[][][] mobData;
 ObstacleData[][][] obsData;
 
 boolean[] obsArr;
-int rows = 7, columns = 9;
+final int rows = 7, columns = 9,
+  maxAmmos = 6, reloadDuration = 60;
 Random rand = new Random();
 
 float gridSize;
 int currentRow = 2, currentColumn = 2;
 Player player;
-boolean up=false, down=false,
-  left=false, right=false, shooting=false;
+boolean up = false, down = false,
+  left = false, right = false, shooting = false;
   
 ArrayList<Mob> mobArr;
 ArrayList<Mob>[] mobGridArr;
@@ -43,7 +44,6 @@ void setup()
   gridSize = width / 11;
 
   player = new Player();
-  
   //mobData[2][3] = appendTo(mobData[2][3], new MobData(4, 8));
   //obsData[2][1] = appendTo(obsData[2][1], new ObstacleData(8, 5, 0));
   //saver.saveIntoData(mapData);
@@ -56,19 +56,20 @@ void draw()
   renderObstacles();
   
   if(player.isDead()) { println("Game Over"); }
-  playerMoves();
-  playerShoots();
+  player.move();
+  player.shoot();
+  player.updateReloadTimer();
   player.renderPlayer();
   
   mobsMove();
+  clearDeadMobs();
   renderMobs();
   
-  clearHitBullets();
   bulletsMove();
+  clearHitBullets();
   renderBullets();
-  clearDeadMobs();
   
-  tmpDisplayRoomInformation();
+  //tmpDisplayRoomInformation();
 }
 
 void keyPressed() { updateDirection(true); }
