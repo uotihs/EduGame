@@ -81,7 +81,6 @@ public class Bullet
         mob.getMobX() + gridSize / 2, mob.getMobY() + gridSize / 2))
       {
         mob.addMobHealth(bulletDamage * -1);
-        println("Hit mob at ("+bulletX+", "+bulletY+")");
         hasHit = true;
         break;
       }

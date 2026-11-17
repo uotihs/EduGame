@@ -74,13 +74,24 @@ public void updateMobsArray()
       mobArr.add(new Mob(thisMobData));
     }
   }
+  clearDeadMobs();
 }
 
 public void clearDeadMobs()
 {
   if(mobArr.size() != 0)
   {
-    mobArr.removeIf(mob -> mob.isDead());
+    mobArr.removeIf(mob -> 
+    {
+      if(mob.isDead())
+      {
+        int curMobRow = max((int)((mob.getMobY() + gridSize / 2) / gridSize) - 1, 0),
+          curMobColumn = max((int)((mob.getMobX() + gridSize / 2) / gridSize) - 1, 0);
+        mobGridArr[curMobRow * columns + curMobColumn].remove(mob);
+        return true;
+      }
+      return false;
+    });
     if(mobArr.size() == 0) { roomCleared(); }
   }
 }
