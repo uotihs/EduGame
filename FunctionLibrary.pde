@@ -1,6 +1,5 @@
 import java.util.Arrays;
 import java.util.ArrayList;
-import java.lang.IndexOutOfBoundsException;
 import java.util.Comparator;
 import java.util.Random;
 
@@ -27,7 +26,23 @@ public void updateDirection(boolean inputValue)
   if((keyCode == 83) || (keyCode == 40)) { down = inputValue; } 
   if((keyCode == 65) || (keyCode == 37)) { left = inputValue; }
   if((keyCode == 68) || (keyCode == 39)) { right = inputValue; }
-  if(keyCode == 82) { player.reload(); }
+  if(keyCode == 82 && !isPaused) { player.reload(); }
+  if(keyCode == 69 && inputValue)
+  {
+    if(isPaused) { isPaused = false; }
+    else { isPaused = true; } 
+  }
+}
+
+public void renderMask()
+{
+  fill(227, 189, 85, 70);
+  rect(0, 0, width, height);
+}
+
+public void gameOver()
+{
+  isPaused = true;
 }
 
 public void updateObsArr()
@@ -175,9 +190,9 @@ public void initializeImages()
     tiles[i] = spritesheet.get(tileSize * i, 0, tileSize, tileSize); 
   }
   
-  for(int i=0; i < weaponImgs.length; i++)
+  for(int i=0; i < weaponImages.length; i++)
   {
-    weaponImgs[i] = loadImage("images/weapon_lv" + (i + 1) + ".png");
+    weaponImages[i] = loadImage("images/weaponLevel" + i + ".png");
   }
 }
 

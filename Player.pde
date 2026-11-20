@@ -8,6 +8,7 @@ public class Player
   private int preRow = 0, preColumn = 0, distLimit = 3;
   private int playerAmmos = 0, reloadTimer = 0;
   private boolean isReloading = false;
+  private final int maxAmmos = 6, reloadDuration = 60;
   // we can consider doing acceleration to get smoother movement?
   
   public Player()
@@ -183,7 +184,7 @@ public class Player
   
   public void shoot()
   {
-    if(shooting)
+    if(isShooting)
     { 
       if(playerAmmos > 0)
       {
@@ -193,7 +194,7 @@ public class Player
         playerAmmos -= 1;
         if(playerAmmos <= 0) { isReloading = true; }
       }
-      shooting = false;
+      isShooting = false;
     }
   }
   
