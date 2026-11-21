@@ -26,7 +26,7 @@ public class Mob
     updatePath();
   }
 
-  private void move()
+  public void move()
   {
     if(canSeePlayer())
     {

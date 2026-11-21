@@ -20,23 +20,23 @@ public class Bullet
     this.targetType = inputTargetType;
   }
 
-  private void move()
+  public void move()
   {
     if(bulletX  + stepX < gridSize || bulletX + stepX > width - gridSize
       || bulletY + stepY < gridSize || bulletY + stepY > height - gridSize)
     {
       hasHit = true;
       return;
-    }  
-    damageTargets();
+    }
     obsDetection();
+    damageTargets();
     bulletX += stepX;
     bulletY += stepY;
   }
   
   private void damageTargets()
   {
-    if(stepX == 0 && stepY == 0) { return; }
+    if((stepX == 0 && stepY == 0) || hasHit == true) { return; }
     if(targetType == TargetType.MOBS) { damageMobs(); }
     else { damagePlayer(); }
   }
