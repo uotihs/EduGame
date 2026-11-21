@@ -1,32 +1,31 @@
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= << EXAMPLE >> =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= \\
 /*
-
-
 
 basicScenePauseUI bsPUI;
 basicSceneUI bsUI;
 
 void setup()
 {
- size(800,600);
-    
+    size(800,600);
+
     bsPUI = new basicScenePauseUI(width,height);
-    // bsUI.pauseUI = bsPUI;
     bsUI = new basicSceneUI(width,height,bsPUI);
-
-
 }
 
 
 void draw()
 {
-  fill(255,255,255);
+    fill(255,255,255);
   
-  rect(width/2,height/2,width,height);
+    rect(width/2,height/2,width,height);
     bsUI.printUI();
 
- 
+
 
 }
+
+NOTES : you can totally copy this to ur code since ive finished the open and close panelPart
 */
 
 
@@ -71,12 +70,17 @@ class basicScenePauseUI
                 text("musicS",wid/2 + wid/18 - wid/4 -60 , hei/2 - hei/6 - hei/12 );
                 musicSoundBar.printSlider();
                 MusicSoundValue = musicSoundBar.nowValue();
+
+                // assign the value to the music player 
+
             }
             if(effectSoundBar != null)
             {
                 text("effectS",wid/2 + wid/18 - wid/4 -60 , hei/2 - hei/6 - hei/12 + hei/12 );
                 effectSoundBar.printSlider();
                 EffectSoundValue = effectSoundBar.nowValue();
+
+                // assign the value to the music player 
             }
 
 
