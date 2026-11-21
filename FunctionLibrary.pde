@@ -392,7 +392,12 @@ public void updateTransition()
       enterRightPortal();
       player.setPlayerX(gridSize);
     }
-    if(isTeleportRoom()) { teleportToSpawn(); }
+    if(isTeleportRoom())
+    {
+      teleportToSpawn();
+      player.setPlayerX((width - playerSize) / 2);
+      player.setPlayerY((height - playerSize) / 2);
+    }
     weapon.updateWeapon();
   }
 }
