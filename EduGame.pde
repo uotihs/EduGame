@@ -8,7 +8,8 @@ boolean[] obsArr;
 final int rows = 7, columns = 9;
 Random rand = new Random();
 
-float gridSize;
+float gridSize, transitionTimer = 0;
+TransDir transDir;
 int currentRow = 2, currentColumn = 2;
 Player player;
 Weapon weapon;
@@ -55,7 +56,7 @@ void draw()
   renderDoors();
   renderObstacles();
   
-  if(!isPaused)
+  if(!isPaused && transitionTimer <= 0)
   {
     if(player.isDead()) { gameOver(); }
     player.move();
@@ -73,6 +74,11 @@ void draw()
   renderMobs();
   player.renderPlayer();
   weapon.renderWeapon();
+  if(transitionTimer > 0)
+  {
+    updateTransition();
+    renderRoomTransition();
+  }
   if(isPaused) { renderMask(); }
   //tmpDisplayRoomInformation();
 }

@@ -8,13 +8,14 @@ public class Player
   private int preRow = 0, preColumn = 0, distLimit = 3;
   private int playerAmmos = 0, reloadTimer = 0;
   private boolean isReloading = false;
-  private final int maxAmmos = 6, reloadDuration = 60;
+  private final int maxAmmos = 6, reloadDuration = 35;
   // we can consider doing acceleration to get smoother movement?
   
   public Player()
   {
     this.playerSize = gridSize;
-    centeringPlayer();
+    this.playerX = (width - playerSize) / 2;
+    this.playerY = (height - playerSize) / 2;
     this.preRow = (int)((playerY + playerSize / 2) / gridSize);
     this.preColumn = (int)((playerX + playerSize / 2) / gridSize);
     playerHealth = maxPlayerHealth;
@@ -35,17 +36,7 @@ public class Player
     if(isTouchingPoint(width / 2, gridSize * 1.5) &&
       hasTopRoom() && mobArr.isEmpty())
     { 
-      enterTopPortal();
-      if(isTeleportRoom())
-      {
-        centeringPlayer();
-        teleportToSpawn();
-      }
-      else
-      {
-        this.playerX = width / 2 - playerSize / 2;
-        this.playerY = height - gridSize - playerSize;
-      }
+      startRoomTransition(TransDir.TUP);
       updateMobsPath();
       return;
     }
@@ -66,17 +57,7 @@ public class Player
     if(isTouchingPoint(width / 2, height - gridSize * 1.5) &&
       hasBottomRoom() && mobArr.isEmpty())
     { 
-      enterBottomPortal();
-      if(isTeleportRoom())
-      {
-        centeringPlayer();
-        teleportToSpawn();
-      }
-      else
-      {
-        this.playerX = width / 2 - playerSize / 2;
-        this.playerY = gridSize * 1;
-      }
+      startRoomTransition(TransDir.TDOWN);
       updateMobsPath();
       return;
     }
@@ -97,17 +78,7 @@ public class Player
     if(isTouchingPoint(gridSize * 1.5, height / 2) &&
       hasLeftRoom() && mobArr.isEmpty())
     { 
-      enterLeftPortal();
-      if(isTeleportRoom())
-      {
-        centeringPlayer();
-        teleportToSpawn();
-      }
-      else
-      {
-        this.playerX = width - gridSize - playerSize;
-        this.playerY = height / 2 - playerSize / 2;
-      }
+      startRoomTransition(TransDir.TLEFT);
       updateMobsPath();
       return;
     }
@@ -128,17 +99,7 @@ public class Player
     if(isTouchingPoint(width - gridSize * 1.5, height / 2) &&
       hasRightRoom() && mobArr.isEmpty())
     { 
-      enterRightPortal();
-      if(isTeleportRoom())
-      {
-        centeringPlayer();
-        teleportToSpawn();
-      }
-      else
-      {
-        this.playerX = gridSize * 1;
-        this.playerY = height / 2 - playerSize / 2;
-      }
+      startRoomTransition(TransDir.TRIGHT);
       updateMobsPath();
       return;
     }
@@ -262,17 +223,14 @@ public class Player
   public float getPlayerY() { return playerY; }
   public float getPlayerSize() { return playerSize; }
   
+  public void setPlayerX(float inputValue) { this.playerX = inputValue; }
+  public void setPlayerY(float inputValue) { this.playerY = inputValue; }
   public void reload()
   {
     if(playerAmmos != maxAmmos)
     {
       this.isReloading = true;
     }
-  }
-  public void centeringPlayer()
-  {
-    this.playerX = width / 2 - playerSize / 2;
-    this.playerY = height / 2 - playerSize / 2;
   }
   public void addPlayerHealth(int inputValue)
   {

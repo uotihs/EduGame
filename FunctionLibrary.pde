@@ -11,7 +11,8 @@ public final int[][][] directions =
   {L, U, D, R}, {L, U, R, D}, {L, D, U, R}, {L, D, R, U}, {L, R, U, D}, {L, R, D, U},
   {R, U, D, L}, {R, U, L, D}, {R, D, U, L}, {R, D, L, U}, {R, L, U, D}, {R, L, D, U}};
 
-enum TargetType {PLAYER, MOBS};
+public enum TargetType {PLAYER, MOBS};
+public enum TransDir {TUP, TDOWN, TLEFT, TRIGHT};
 
 public static <T> T[] appendTo(T[] oldArr, T item)
 {
@@ -27,7 +28,7 @@ public void updateDirection(boolean inputValue)
   if((keyCode == 65) || (keyCode == 37)) { left = inputValue; }
   if((keyCode == 68) || (keyCode == 39)) { right = inputValue; }
   if(keyCode == 82 && !isPaused) { player.reload(); }
-  if(keyCode == 69 && inputValue)
+  if(keyCode == 69 && inputValue && transitionTimer <= 0)
   {
     if(isPaused) { isPaused = false; }
     else { isPaused = true; } 
@@ -40,9 +41,47 @@ public void renderMask()
   rect(0, 0, width, height);
 }
 
+public void renderRoomTransition()
+{
+  fill(#061D43);
+  float outerR = dist(0, 0, (float)rows / 2 + 1, (float)columns / 2 + 1);
+  if(transitionTimer > 30)
+  {
+    donutShape(width / 2, height / 2, PI * 1.5, PI * (1.5 + (60 - transitionTimer) / 15.0),
+      gridSize * 1.5, gridSize * outerR);
+    circle(width / 2, height / 2, gridSize * 3 * ((60 - transitionTimer) / 30) + 2);
+  }
+  else
+  {
+    donutShape(width / 2, height / 2, PI  * (1.5 - transitionTimer / 15.0), PI * 1.5,
+      gridSize * 1.5, gridSize * outerR);
+    circle(width / 2, height / 2, gridSize * 3 * (transitionTimer / 30) + 2);
+  }
+}
+
+public void donutShape(float centerX, float centerY,
+  float startAngle, float endAngle, float innerR, float outerR)
+{
+  int steps = 60;
+  float dAngle = (endAngle - startAngle) / steps;
+  beginShape();
+  for(int i = 0; i <= steps; i++)
+  {
+    float curAngle = startAngle + i * dAngle;
+    vertex(centerX + cos(curAngle) * innerR, centerY + sin(curAngle) * innerR);
+  }
+  for(int i = steps; i >= 0; i--)
+  {
+    float curAngle = startAngle + i * dAngle;
+    vertex(centerX + cos(curAngle) * outerR, centerY + sin(curAngle) * outerR); 
+  }
+  endShape(CLOSE);
+}
+
 public void gameOver()
 {
   isPaused = true;
+  // unfinished yet
 }
 
 public void updateObsArr()
@@ -317,6 +356,47 @@ public void teleportToSpawn()
   updateAllArrays();
 }
 
+public void startRoomTransition(TransDir dir)
+{
+  if(transitionTimer > 0) return;
+  transitionTimer = 60;
+  transDir = dir;
+}
+
+public void updateTransition()
+{
+  if(transitionTimer <= 0) return;
+  transitionTimer -= 1;
+  if(transitionTimer == 30)
+  {
+    float playerSize = player.getPlayerSize();
+    player.setPlayerX((width - playerSize) / 2);
+    player.setPlayerY((height - playerSize) / 2);
+    if(transDir == TransDir.TUP)
+    {
+      enterTopPortal();
+      player.setPlayerY(height - gridSize - playerSize);
+    }
+    else if(transDir == TransDir.TDOWN)
+    {
+      enterBottomPortal();
+      player.setPlayerY(gridSize);
+    }
+    else if(transDir == TransDir.TLEFT)
+    {
+      enterLeftPortal();
+      player.setPlayerX(width - gridSize - playerSize);
+    }
+    else if(transDir == TransDir.TRIGHT)
+    {
+      enterRightPortal();
+      player.setPlayerX(gridSize);
+    }
+    if(isTeleportRoom()) { teleportToSpawn(); }
+    weapon.updateWeapon();
+  }
+}
+
 public void enterTopPortal()
 {
   if(hasTopRoom())
@@ -336,7 +416,7 @@ public void enterBottomPortal()
 public void enterLeftPortal()
 {
   if(hasLeftRoom())
-  { 
+  {
     currentColumn -= 1;
     updateAllArrays();
   }
