@@ -1,14 +1,14 @@
 public class Bullet
 {
   private float bulletX=0, bulletY=0;
-  private float stepX=0, stepY=0;
-  private float speed=15, bulletSize=20;
-  private int bulletDamage=0;
+  private float stepX=0, stepY=0, stepAngle=0;
+  private float speed=15, bulletSize=30;
+  private int bulletDamage=0, bulletType=0, shiningStage=0;
   private TargetType targetType;
   private boolean hasHit=false;
 
   public Bullet(float spawnX, float spawnY, float targetX, float targetY, 
-    int inputDamage, TargetType inputTargetType)
+    int inputDamage, int inputBulletType, TargetType inputTargetType)
   {
     this.bulletX = spawnX;
     this.bulletY = spawnY;
@@ -17,6 +17,8 @@ public class Bullet
     float d = dist(spawnX, spawnY, targetX, targetY);
     this.stepX = speed * ((targetX - spawnX) / d);
     this.stepY = speed * ((targetY - spawnY) / d);
+    this.stepAngle = atan(stepY / stepX);
+    this.bulletType = inputBulletType;
     this.targetType = inputTargetType;
   }
 
@@ -81,6 +83,7 @@ public class Bullet
         mob.getMobX() + gridSize / 2, mob.getMobY() + gridSize / 2))
       {
         mob.addMobHealth(bulletDamage * -1);
+        mob.gotHit();
         hasHit = true;
         break;
       }
@@ -93,14 +96,15 @@ public class Bullet
         player.getPlayerX() + gridSize / 2, player.getPlayerY() + gridSize / 2))
     {
       player.addPlayerHealth(bulletDamage * -1);
+      player.gotHit();
       hasHit = true;
     }
   }
   
   private void obsDetection()
   {
-    int curRow = (int)(bulletY / gridSize),
-      curColumn = (int)(bulletX / gridSize);
+    int curRow = (int)((bulletY + bulletSize / 2) / gridSize),
+      curColumn = (int)((bulletX + bulletSize / 2) / gridSize);
     if(isObstacle(curRow, curColumn)) { hasHit = true; }
   }
   
@@ -119,8 +123,25 @@ public class Bullet
     if(hasHit) { return; }
     fill(255, 230, 0); 
     noStroke();
-    ellipse(bulletX, bulletY, bulletSize, bulletSize);
+    pushMatrix();
+    translate(bulletX, bulletY);
+    rotate(stepAngle);
+    if(shiningStage < 4)
+    {
+      image(bulletImages[bulletType * 2], 0, 0, bulletSize, bulletSize);
+    }
+    else
+    {
+      image(bulletImages[bulletType * 2 + 1], 0, 0, bulletSize, bulletSize);
+    }
+    popMatrix();
   }
   
   public boolean hasHitObject() { return hasHit; }
+  
+  public void updateShiningStage()
+  {
+    shiningStage += 1;
+    if(shiningStage >= 8) shiningStage = 0;
+  }
 }

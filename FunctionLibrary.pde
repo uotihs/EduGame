@@ -177,6 +177,8 @@ public void mobsMove()
       mobGridArr[preMobRow * columns + preMobColumn].remove(thisMob);
       mobGridArr[curMobRow * columns + curMobColumn].add(thisMob);
       thisMob.updateRC();
+      thisMob.updateHitTimer();
+      thisMob.updateStageTimer();
     }
     thisMob.addAttackCooldown(-1);
   }
@@ -207,6 +209,7 @@ public void bulletsMove()
   for(Bullet thisBullet: bulletArr)
   {
     thisBullet.move();
+    thisBullet.updateShiningStage();
   }
 }
 
@@ -221,14 +224,23 @@ public void renderBullets()
 public void initializeImages()
 {
   backgroundImage = loadImage("images/background.png");
-  
-  PImage spritesheet = loadImage("images/spritesheet.png");
+  playerImage = loadImage("images/player.png");
   int tileSize = 128;
+  PImage spritesheet = loadImage("images/spritesheet.png");
+  PImage bullets = loadImage("images/bullets.png");
+  PImage mobs = loadImage("images/mobs.png");
   for(int i=0; i < tiles.length; i++)
   {
-    tiles[i] = spritesheet.get(tileSize * i, 0, tileSize, tileSize); 
+    tiles[i] = spritesheet.get(tileSize * i, 0, tileSize, tileSize);
   }
-  
+  for(int i = 0; i < bulletImages.length; i++)
+  {
+    bulletImages[i] = bullets.get(tileSize * i, 0, tileSize, tileSize); 
+  }
+  for(int i=0; i < mobImages.length; i++)
+  {
+    mobImages[i] = mobs.get(tileSize * i, 0, tileSize, tileSize);
+  }
   for(int i=0; i < weaponImages.length; i++)
   {
     weaponImages[i] = loadImage("images/weaponLevel" + i + ".png");

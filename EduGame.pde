@@ -20,9 +20,9 @@ ArrayList<Mob> mobArr;
 ArrayList<Mob>[] mobGridArr;
 ArrayList<Bullet> bulletArr = new ArrayList<Bullet>();
 
-PImage backgroundImage;
-PImage[] tiles = new PImage[11];
-PImage[] weaponImages = new PImage[4];
+PImage backgroundImage, playerImage;
+PImage[] tiles = new PImage[12], bulletImages = new PImage[6];
+PImage[] mobImages = new PImage[18], weaponImages = new PImage[4];
 
 void setup()
 {
@@ -36,11 +36,14 @@ void setup()
   obsData = mapData.obsData;
   saver.saveIntoData(mapData);
   
+  tmpPrintRoomDisData();
+  
   updateAllArrays();
 
   initializeImages();
   
   size(880, 720);
+  //880, 720
   gridSize = width / 11;
 
   player = new Player();
@@ -62,6 +65,7 @@ void draw()
     player.move();
     player.shoot();
     player.updateReloadTimer();
+    player.updateHitTimer();
     weapon.updateWeapon();
   
     mobsMove();

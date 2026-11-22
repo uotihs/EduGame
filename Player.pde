@@ -6,7 +6,7 @@ public class Player
   private int playerHealth = 0;
   private final int maxPlayerHealth = 100;
   private int preRow = 0, preColumn = 0, distLimit = 3;
-  private int playerAmmos = 0, reloadTimer = 0;
+  private int playerAmmos = 0, reloadTimer = 0, hitTimer = 0;
   private boolean isReloading = false;
   private final int maxAmmos = 6, reloadDuration = 35;
   // we can consider doing acceleration to get smoother movement?
@@ -151,7 +151,7 @@ public class Player
       {
         bulletArr.add(
           new Bullet(playerX + playerSize / 2, playerY + playerSize / 2, 
-          mouseX, mouseY, 10, TargetType.MOBS));
+          mouseX - 15, mouseY - 15, 10, 0, TargetType.MOBS));
         playerAmmos -= 1;
         if(playerAmmos <= 0) { isReloading = true; }
       }
@@ -176,11 +176,16 @@ public class Player
   
   public void renderPlayer()
   {
-    // should do image(charcterTiles[i], playerX, playerY, playerSize, playerSize); here.
-    // using rect() as tmp rendering object. 
     noStroke();
-    fill(#F72A2A);
-    rect(playerX, playerY, playerSize, playerSize);
+    image(playerImage, playerX, playerY, playerSize, playerSize);
+    if(hitTimer <= 4 && hitTimer > 0)
+    {
+      blendMode(SUBTRACT);
+      tint(#0B8AA2);
+      image(playerImage, playerX, playerY, playerSize, playerSize);
+      noTint();
+      blendMode(BLEND);
+    }
     displayHealthPointBar();
     displayAmmosBar();
   }
@@ -225,6 +230,8 @@ public class Player
   
   public void setPlayerX(float inputValue) { this.playerX = inputValue; }
   public void setPlayerY(float inputValue) { this.playerY = inputValue; }
+  public void gotHit() { hitTimer = 4; }
+  public void updateHitTimer() { hitTimer = max(hitTimer - 1, 0); }
   public void reload()
   {
     if(playerAmmos != maxAmmos)
