@@ -34,7 +34,7 @@ public class Player
   public void moveUp()
   { 
     if(isTouchingPoint(width / 2, gridSize * 1.5) &&
-      hasTopRoom() && mobArr.isEmpty())
+      hasTopRoom() && mobArr.isEmpty() && legMob == null)
     { 
       startRoomTransition(TransDir.TUP);
       updateMobsPath();
@@ -55,7 +55,7 @@ public class Player
   public void moveDown()
   {
     if(isTouchingPoint(width / 2, height - gridSize * 1.5) &&
-      hasBottomRoom() && mobArr.isEmpty())
+      hasBottomRoom() && mobArr.isEmpty() && legMob == null)
     { 
       startRoomTransition(TransDir.TDOWN);
       updateMobsPath();
@@ -76,7 +76,7 @@ public class Player
   public void moveLeft()
   {
     if(isTouchingPoint(gridSize * 1.5, height / 2) &&
-      hasLeftRoom() && mobArr.isEmpty())
+      hasLeftRoom() && mobArr.isEmpty() && legMob == null)
     { 
       startRoomTransition(TransDir.TLEFT);
       updateMobsPath();
@@ -97,7 +97,7 @@ public class Player
   public void moveRight()
   {
     if(isTouchingPoint(width - gridSize * 1.5, height / 2) &&
-      hasRightRoom() && mobArr.isEmpty())
+      hasRightRoom() && mobArr.isEmpty() && legMob == null)
     { 
       startRoomTransition(TransDir.TRIGHT);
       updateMobsPath();
@@ -178,10 +178,11 @@ public class Player
   {
     noStroke();
     image(playerImage, playerX, playerY, playerSize, playerSize);
-    if(hitTimer <= 4 && hitTimer > 0)
+    if(hitTimer > 0)
     {
       blendMode(SUBTRACT);
-      tint(#0B8AA2);
+      if(hitTimer > 6) { tint(#0B8AA2); }
+      else { tint(#101F64); }
       image(playerImage, playerX, playerY, playerSize, playerSize);
       noTint();
       blendMode(BLEND);
@@ -230,7 +231,10 @@ public class Player
   
   public void setPlayerX(float inputValue) { this.playerX = inputValue; }
   public void setPlayerY(float inputValue) { this.playerY = inputValue; }
-  public void gotHit() { hitTimer = 4; }
+  public void gotHit()
+  {
+    if(hitTimer == 0) { hitTimer = 10; }
+  }
   public void updateHitTimer() { hitTimer = max(hitTimer - 1, 0); }
   public void reload()
   {
@@ -241,6 +245,9 @@ public class Player
   }
   public void addPlayerHealth(int inputValue)
   {
-    this.playerHealth = min(max(playerHealth + inputValue, 0), maxPlayerHealth);
+    if(hitTimer == 0)
+    {
+      this.playerHealth = min(max(playerHealth + inputValue, 0), maxPlayerHealth);
+    }
   }
 }

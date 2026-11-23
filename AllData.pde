@@ -27,10 +27,11 @@ public class MobData
   private int mobColumn=0;
   private int mobHealth=10;
   
-  public MobData(int inputRow, int inputColumn)
+  public MobData(int inputRow, int inputColumn, int inputHealth)
   {
     this.mobRow = inputRow;
     this.mobColumn = inputColumn;
+    this.mobHealth = inputHealth;
   }
   
   public int getMobRow() { return mobRow; }

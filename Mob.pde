@@ -170,7 +170,7 @@ public class Mob
             player.playerX + player.getPlayerSize() / 2 - 15,
             player.playerY + player.getPlayerSize() / 2 - 15,
             10, 1, TargetType.PLAYER));
-        attackCooldown = 120;
+        attackCooldown = 60;
       }
     }
     if(stage == 2 && stageTimer == 0)
@@ -424,8 +424,15 @@ public class Mob
   public int getMobHealth() { return mobHealth; }
   public int getPreRow() { return preRow; }
   public int getPreColumn() { return preColumn; }
+  public int getHitTimer() { return hitTimer; }
   
-  public void addMobHealth(int inputValue) { this.mobHealth += inputValue; }
+  public void addMobHealth(int inputValue)
+  {
+    if(hitTimer == 0)
+    {
+      this.mobHealth = max(mobHealth + inputValue, 0);
+    }
+  }
   public void addAttackCooldown(int inputValue)
   { 
     this.attackCooldown = max(attackCooldown + inputValue, 0);

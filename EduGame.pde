@@ -13,12 +13,15 @@ TransDir transDir;
 int currentRow = 2, currentColumn = 2;
 Player player;
 Weapon weapon;
+Mob legMob = null;
+Boss boss = null;
 boolean up = false, down = false, left = false,
   right = false, isShooting = false, isPaused = false;
-  
+
 ArrayList<Mob> mobArr;
 ArrayList<Mob>[] mobGridArr;
-ArrayList<Bullet> bulletArr = new ArrayList<Bullet>();
+ArrayList<Bullet> bulletArr = new ArrayList<Bullet>(),
+  splitParentArr = new ArrayList<Bullet> ();
 
 PImage backgroundImage, playerImage;
 PImage[] tiles = new PImage[12], bulletImages = new PImage[6];
@@ -48,7 +51,7 @@ void setup()
 
   player = new Player();
   weapon = new Weapon();
-  //mobData[2][3] = appendTo(mobData[2][3], new MobData(4, 8));
+  //mobData[3][2] = appendTo(mobData[3][2], new MobData(2, 2, 100));
   //obsData[2][1] = appendTo(obsData[2][1], new ObstacleData(8, 5, 0));
   //saver.saveIntoData(mapData);
 }
@@ -73,6 +76,7 @@ void draw()
   
     bulletsMove();
     clearHitBullets();
+    addSplitBullets();
   }
   renderBullets();
   renderMobs();
