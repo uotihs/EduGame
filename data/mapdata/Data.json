@@ -83,7 +83,23 @@
     [
       [],
       [],
-      [],
+      [
+        {
+          "mobRow": 2,
+          "mobColumn": 2,
+          "mobHealth": 100
+        },
+        {
+          "mobRow": 4,
+          "mobColumn": 5,
+          "mobHealth": 150
+        },
+        {
+          "mobRow": 6,
+          "mobColumn": 7,
+          "mobHealth": 200
+        }
+      ],
       [],
       []
     ],
@@ -111,7 +127,13 @@
       []
     ],
     [
-      [],
+      [
+        {
+          "obsRow": 4,
+          "obsColumn": 5,
+          "obsType": 3
+        }
+      ],
       [
         {
           "obsRow": 5,
@@ -288,19 +310,47 @@
           "obsType": 0
         }
       ],
+      [
+        {
+          "obsRow": 4,
+          "obsColumn": 5,
+          "obsType": 3
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "obsRow": 4,
+          "obsColumn": 3,
+          "obsType": 0
+        },
+        {
+          "obsRow": 3,
+          "obsColumn": 6,
+          "obsType": 1
+        },
+        {
+          "obsRow": 6,
+          "obsColumn": 7,
+          "obsType": 2
+        }
+      ],
+      [],
+      [],
+      [],
       []
     ],
     [
       [],
       [],
-      [],
-      [],
-      []
-    ],
-    [
-      [],
-      [],
-      [],
+      [
+        {
+          "obsRow": 4,
+          "obsColumn": 5,
+          "obsType": 3
+        }
+      ],
       [],
       []
     ]

@@ -13,6 +13,7 @@ public final int[][][] directions =
 
 public enum TargetType {PLAYER, MOBS};
 public enum TransDir {TUP, TDOWN, TLEFT, TRIGHT};
+public enum HitResult {NOT_HIT, HIT_OBS, HIT_TARGET}
 
 public static <T> T[] appendTo(T[] oldArr, T item)
 {
@@ -28,7 +29,7 @@ public void updateDirection(boolean inputValue)
   if((keyCode == 65) || (keyCode == 37)) { left = inputValue; }
   if((keyCode == 68) || (keyCode == 39)) { right = inputValue; }
   if(keyCode == 82 && !isPaused) { player.reload(); }
-  if(keyCode == 69 && inputValue && transitionTimer <= 0)
+  if(keyCode == 69 && inputValue && transitionTimer <= 0 && !player.isDead())
   {
     if(isPaused) { isPaused = false; }
     else { isPaused = true; } 
@@ -115,6 +116,13 @@ public void updateMobsGridArray()
        mobColumn = max((int)((mob.getMobX() + gridSize / 2) / gridSize) - 1, 0);
     mobGridArr[mobRow * columns + mobColumn].add(mob);
   }
+  
+  if(roomDisData[currentRow][currentColumn] % 10 == 3
+    && legMob == null)
+  {
+    legMob = new Mob(new MobData(4, 5, 100));
+    boss = new Boss();
+  }
 }
 
 public void updateMobsArray()
@@ -148,7 +156,19 @@ public void clearDeadMobs()
       }
       return false;
     });
-    if(mobArr.size() == 0) { roomCleared(); }
+    if(mobArr.size() == 0 && legMob == null) { roomCleared(); }
+  }
+  if(legMob != null)
+  {
+    if(legMob.isDead())
+    {
+      legMob = null;
+      boss = null;
+      mobArr = new ArrayList<Mob> ();
+      mobGridArr = new ArrayList[rows * columns];
+      for(int i = 0; i < mobGridArr.length; i++) { mobGridArr[i] = new ArrayList<Mob>(); }
+      bossRoomCleared();
+    }
   }
 }
 
@@ -156,11 +176,13 @@ public void roomCleared()
 {
   mobData[currentRow][currentColumn] = null;
   player.addPlayerHealth(20);
+  println("Normal clear");
 }
 
-public void clearHitBullets()
+public void bossRoomCleared()
 {
-  bulletArr.removeIf(bullet -> bullet.hasHitObject());
+  player.addPlayerHealth(50);
+  println("Boss clear");
 }
 
 public void mobsMove()
@@ -178,22 +200,28 @@ public void mobsMove()
       mobGridArr[curMobRow * columns + curMobColumn].add(thisMob);
       thisMob.updateRC();
     }
+    thisMob.updateHitTimer();
+    thisMob.updateStageTimer();
     thisMob.addAttackCooldown(-1);
+  }
+  if(legMob != null)
+  {
+    legMob.move();
+    legMob.updateHitTimer();
+    
+    boss.teleportToLegMob();
+    boss.updateStageTimer();
+    boss.addAttackCooldown(-1);
+    boss.attack();
   }
 }
 
 public void renderMobs()
 {
-  //int d=0;
+  if(boss != null) { boss.renderBoss(); }
   for(Mob thisMob: mobArr)
   {
     thisMob.renderMob();
-    /*
-    float thisTargetRow = thisMob.path.get(0)[0],
-      thisTargetColumn = thisMob.path.get(0)[1];
-    text("mobX: "+thisMob.getMobX()+" mobY: "+thisMob.getMobY()+" hp: "+thisMob.getMobHealth()
-      +"\nTargetRC: ("+thisTargetRow+", "+thisTargetColumn+")", 300, d * 100 + 300);
-    d += 1; */
   }
 }
 
@@ -202,11 +230,45 @@ public void updateBulletsArray()
   bulletArr.clear(); 
 }
 
+public void clearHitBullets()
+{
+  bulletArr.removeIf(bullet -> 
+    {
+      if(bullet.hasHitObject())
+      {
+        if(bullet.bulletType == 2 && bullet.getHasHit() == HitResult.HIT_OBS)
+        {
+          splitParentArr.add(bullet);
+        }
+        return true;
+      }
+      return false;
+    });
+}
+
+public void addSplitBullets()
+{
+  for(Bullet bullet : splitParentArr)
+  {
+    float bX = bullet.getBulletX(), bY = bullet.getBulletY(),
+      thisAngle = bullet.getBulletAngle(), spreadAngle = 0.5;
+    bX -= cos(thisAngle) * 17; bY -= sin(thisAngle) * 17;
+    for(int i = 0; i < 4; i++)
+    {
+      bulletArr.add(new Bullet(
+        bX, bY, bX - cos(thisAngle + (i - 1.5) * spreadAngle),
+        bY - sin(thisAngle + (i - 1.5) * spreadAngle), 10, 1, bullet.getTargetType()));
+    }
+  }
+  splitParentArr.clear();
+}
+
 public void bulletsMove()
 {
   for(Bullet thisBullet: bulletArr)
   {
     thisBullet.move();
+    thisBullet.updateShiningStage();
   }
 }
 
@@ -221,14 +283,23 @@ public void renderBullets()
 public void initializeImages()
 {
   backgroundImage = loadImage("images/background.png");
-  
-  PImage spritesheet = loadImage("images/spritesheet.png");
+  playerImage = loadImage("images/player.png");
   int tileSize = 128;
+  PImage spritesheet = loadImage("images/spritesheet.png");
+  PImage bullets = loadImage("images/bullets.png");
+  PImage mobs = loadImage("images/mobs.png");
   for(int i=0; i < tiles.length; i++)
   {
-    tiles[i] = spritesheet.get(tileSize * i, 0, tileSize, tileSize); 
+    tiles[i] = spritesheet.get(tileSize * i, 0, tileSize, tileSize);
   }
-  
+  for(int i = 0; i < bulletImages.length; i++)
+  {
+    bulletImages[i] = bullets.get(tileSize * i, 0, tileSize, tileSize); 
+  }
+  for(int i=0; i < mobImages.length; i++)
+  {
+    mobImages[i] = mobs.get(tileSize * i, 0, tileSize, tileSize);
+  }
   for(int i=0; i < weaponImages.length; i++)
   {
     weaponImages[i] = loadImage("images/weaponLevel" + i + ".png");
@@ -318,7 +389,7 @@ public void renderBackground()
 
 public void renderDoors()
 {
-  if(mobArr.isEmpty())
+  if(mobArr.isEmpty() && legMob == null)
   {
     if(hasTopRoom()) {image(tiles[1], gridSize * 5, 0, gridSize, gridSize); }
     if(hasBottomRoom()) { image(tiles[3], gridSize * 5, height - gridSize, gridSize, gridSize); }
@@ -392,7 +463,12 @@ public void updateTransition()
       enterRightPortal();
       player.setPlayerX(gridSize);
     }
-    if(isTeleportRoom()) { teleportToSpawn(); }
+    if(isTeleportRoom())
+    {
+      teleportToSpawn();
+      player.setPlayerX((width - playerSize) / 2);
+      player.setPlayerY((height - playerSize) / 2);
+    }
     weapon.updateWeapon();
   }
 }

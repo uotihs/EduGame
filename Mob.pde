@@ -9,7 +9,8 @@ public class Mob
   private float mobX=0, mobY=0, mobSize=0;
   private float speed=2;
   private int mobType=0, mobHealth=0, initMobHealth=0, randSeed=0;
-  private int preRow=0, preColumn=0, attackCooldown=0;
+  private int preRow=0, preColumn=0, stage=0, stageTimer=0,
+    hitTimer=0, attackCooldown=0;
   private ArrayList<int[]> path = new ArrayList<>(),
     originalPath = new ArrayList<>();
   private boolean preCanSee = true;
@@ -22,6 +23,7 @@ public class Mob
     this.mobHealth = initMobHealth;
     this.mobSize = gridSize;
     this.randSeed = rand.nextInt(24);
+    this.mobType = (roomDisData[currentRow][currentColumn] / 10 - 1) * 2;
     updateRC();
     updatePath();
   }
@@ -43,6 +45,8 @@ public class Mob
         resetPath();
         preCanSee = false;
       }
+      stage = 0;
+      stageTimer = 0;
       walkTowardWaypoint();
     }
   }
@@ -150,15 +154,28 @@ public class Mob
   
   private void attackPlayer()
   {
-    //text("Attack!", mobX, mobY - 10);
     if(attackCooldown == 0)
     {
-      bulletArr.add(
-      new Bullet(mobX + mobSize / 2,  mobY + mobSize / 2, 
-        player.playerX + player.getPlayerSize() / 2,
-        player.playerY + player.getPlayerSize() / 2,
-        10, TargetType.PLAYER));
-        attackCooldown = 120;
+      if(stage == 0 && stageTimer == 0)
+      {
+         stageTimer = 10;
+         stage = 1;
+      }
+      else if(stage == 1 && stageTimer == 0)
+      {
+        stage = 2;
+        stageTimer = 6;
+        bulletArr.add(
+          new Bullet(mobX + mobSize / 2,  mobY + mobSize / 2, 
+            player.playerX + player.getPlayerSize() / 2 - 15,
+            player.playerY + player.getPlayerSize() / 2 - 15,
+            10, 1, TargetType.PLAYER));
+        attackCooldown = 60;
+      }
+    }
+    if(stage == 2 && stageTimer == 0)
+    {
+      stage = 0;
     }
   }
   
@@ -377,11 +394,16 @@ public class Mob
 
   public void renderMob()
   {
-    // also should do image(charcterTiles[i+mobType], mobX, mobY, mobSize, mobSize); here.
-    // using rect() as tmp rendering object.
-    noStroke();
-    fill(#F72A2A);
-    rect(mobX, mobY, mobSize, mobSize);
+    image(mobImages[mobType * 3 + stage], mobX, mobY, mobSize, mobSize);
+    if(hitTimer <= 4 && hitTimer > 0)
+    {
+      blendMode(SUBTRACT);
+      tint(#0B8AA2);
+      image(mobImages[mobType * 3 + stage], mobX, mobY, mobSize, mobSize);
+      noTint();
+      blendMode(BLEND);
+    }
+    noTint();
     displayHealthPointBar();
   }
   
@@ -402,10 +424,20 @@ public class Mob
   public int getMobHealth() { return mobHealth; }
   public int getPreRow() { return preRow; }
   public int getPreColumn() { return preColumn; }
+  public int getHitTimer() { return hitTimer; }
   
-  public void addMobHealth(int inputValue) { this.mobHealth += inputValue; }
+  public void addMobHealth(int inputValue)
+  {
+    if(hitTimer == 0)
+    {
+      this.mobHealth = max(mobHealth + inputValue, 0);
+    }
+  }
   public void addAttackCooldown(int inputValue)
   { 
     this.attackCooldown = max(attackCooldown + inputValue, 0);
   }
+  public void gotHit() { hitTimer = 4; }
+  public void updateHitTimer() { hitTimer = max(hitTimer - 1, 0); }
+  public void updateStageTimer() { stageTimer = max(stageTimer - 1, 0); }
 }
