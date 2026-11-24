@@ -183,6 +183,17 @@ public class Boss
     }
   }
   
+  public void renderBossHealthBar()
+  {
+    image(bossHealthBarFrame, gridSize * 2, 0,
+      gridSize * 7, gridSize);
+    fill(#E8070B);
+    rect(gridSize * 3, gridSize * (7.0 / 16),
+      gridSize * 5 * ((float)legMob.getMobHealth() / legMob.getInitMobHealth()),
+      gridSize / 8);
+    image(wordCards[bossType], gridSize * 2, 0, gridSize * 3, gridSize);
+  }
+  
   public void addAttackCooldown(int inputValue)
   { 
     this.attackCooldown = max(attackCooldown + inputValue, 0);

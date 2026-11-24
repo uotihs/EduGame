@@ -116,13 +116,6 @@ public void updateMobsGridArray()
        mobColumn = max((int)((mob.getMobX() + gridSize / 2) / gridSize) - 1, 0);
     mobGridArr[mobRow * columns + mobColumn].add(mob);
   }
-  
-  if(roomDisData[currentRow][currentColumn] % 10 == 3
-    && legMob == null)
-  {
-    legMob = new Mob(new MobData(4, 5, 100));
-    boss = new Boss();
-  }
 }
 
 public void updateMobsArray()
@@ -131,6 +124,12 @@ public void updateMobsArray()
   MobData[] thisMobsData = mobData[currentRow][currentColumn];
   if(thisMobsData != null)
   {
+    if(roomDisData[currentRow][currentColumn] % 10 == 3)
+    {
+      legMob = new Mob(thisMobsData[0]);
+      boss = new Boss();
+      return;
+    }
     for(MobData thisMobData: thisMobsData)
     {
       if(thisMobData.getMobHealth() > 0)
@@ -181,8 +180,10 @@ public void roomCleared()
 
 public void bossRoomCleared()
 {
+  mobData[currentRow][currentColumn] = null;
   player.addPlayerHealth(50);
-  println("Boss clear");
+  bossKilled += 1;
+  println("Boss clear: "+bossKilled);
 }
 
 public void mobsMove()
@@ -219,10 +220,15 @@ public void mobsMove()
 public void renderMobs()
 {
   if(boss != null) { boss.renderBoss(); }
-  for(Mob thisMob: mobArr)
+  for(int i = mobArr.size() - 1; i >= 0; i--)
   {
-    thisMob.renderMob();
+    mobArr.get(i).renderMob();
   }
+}
+
+public void renderBossHealthBar()
+{
+  if(boss != null) { boss.renderBossHealthBar(); }
 }
 
 public void updateBulletsArray()
@@ -284,10 +290,12 @@ public void initializeImages()
 {
   backgroundImage = loadImage("images/background.png");
   playerImage = loadImage("images/player.png");
+  bossHealthBarFrame = loadImage("images/bossHealthBarFrame.png");
   int tileSize = 128;
   PImage spritesheet = loadImage("images/spritesheet.png");
   PImage bullets = loadImage("images/bullets.png");
   PImage mobs = loadImage("images/mobs.png");
+  PImage words = loadImage("images/wordCards.png");
   for(int i=0; i < tiles.length; i++)
   {
     tiles[i] = spritesheet.get(tileSize * i, 0, tileSize, tileSize);
@@ -303,6 +311,10 @@ public void initializeImages()
   for(int i=0; i < weaponImages.length; i++)
   {
     weaponImages[i] = loadImage("images/weaponLevel" + i + ".png");
+  }
+  for(int i = 0; i < wordCards.length; i++)
+  {
+    wordCards[i] = words.get(0, tileSize * i, tileSize * 3, tileSize); 
   }
 }
 
@@ -348,6 +360,8 @@ public void tmpDisplayRoomInformation()
 
 public boolean hasTopRoom()
 {
+  //special final room door lock
+  if(currentRow == 2 && currentColumn == 2 && bossKilled < 3) { return false; }
   if(currentRow - 1 < 0) { return false; }
   else if(roomDisData[currentRow - 1][currentColumn] == -1
     || (roomDisData[currentRow - 1][currentColumn] == 67 
@@ -402,6 +416,27 @@ public void renderDoors()
     if(hasBottomRoom()) { image(tiles[2], gridSize * 5, height - gridSize, gridSize, gridSize); }
     if(hasLeftRoom()) { image(tiles[4], 0, gridSize * 4, gridSize, gridSize); }
     if(hasRightRoom()) { image(tiles[6], width - gridSize, gridSize * 4, gridSize, gridSize); }
+  }
+  //special final room door
+  if(currentRow == 2 && currentColumn == 2)
+  {
+    if(hasTopRoom())
+    {
+      //green rect placeholder for open final door.
+      fill(#1CF700);
+      rect(gridSize * 5, 0, gridSize, gridSize);
+    }
+    else
+    {
+      //red rect placeholder for closed final door,
+      //should use bossKilled to do something like finalDoorImages[bossKilled] -> 4 in len.
+      noStroke();
+      fill(#F70000);
+      rect(gridSize * 5, 0, gridSize, gridSize);
+      fill(#F0A2A9);
+      textSize(35);
+      text(bossKilled, gridSize * 5.4, gridSize * 0.6);
+    }
   }
 }
 

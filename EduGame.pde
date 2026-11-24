@@ -10,7 +10,7 @@ Random rand = new Random();
 
 float gridSize, transitionTimer = 0;
 TransDir transDir;
-int currentRow = 2, currentColumn = 2;
+int currentRow = 2, currentColumn = 2, bossKilled = 0;
 Player player;
 Weapon weapon;
 Mob legMob = null;
@@ -23,9 +23,9 @@ ArrayList<Mob>[] mobGridArr;
 ArrayList<Bullet> bulletArr = new ArrayList<Bullet>(),
   splitParentArr = new ArrayList<Bullet> ();
 
-PImage backgroundImage, playerImage;
-PImage[] tiles = new PImage[12], bulletImages = new PImage[6];
-PImage[] mobImages = new PImage[18], weaponImages = new PImage[4];
+PImage backgroundImage, playerImage, bossHealthBarFrame;
+PImage[] tiles = new PImage[12], bulletImages = new PImage[6],
+  mobImages = new PImage[18], weaponImages = new PImage[4], wordCards = new PImage[3];
 
 void setup()
 {
@@ -45,7 +45,7 @@ void setup()
 
   initializeImages();
   
-  size(880, 720);
+  size(935, 765);
   //880, 720
   gridSize = width / 11;
 
@@ -82,6 +82,7 @@ void draw()
   renderMobs();
   player.renderPlayer();
   weapon.renderWeapon();
+  renderBossHealthBar();
   if(transitionTimer > 0)
   {
     updateTransition();
