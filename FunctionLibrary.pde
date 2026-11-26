@@ -11,9 +11,10 @@ public final int[][][] directions =
   {L, U, D, R}, {L, U, R, D}, {L, D, U, R}, {L, D, R, U}, {L, R, U, D}, {L, R, D, U},
   {R, U, D, L}, {R, U, L, D}, {R, D, U, L}, {R, D, L, U}, {R, L, U, D}, {R, L, D, U}};
 
-public enum TargetType {PLAYER, MOBS};
-public enum TransDir {TUP, TDOWN, TLEFT, TRIGHT};
+public enum TargetType {PLAYER, MOBS}
+public enum TransDir {TUP, TDOWN, TLEFT, TRIGHT}
 public enum HitResult {NOT_HIT, HIT_OBS, HIT_TARGET}
+public enum CutSceneType {FINAL_DOOR_DISPLAY, BOSS_INTRO}
 
 public static <T> T[] appendTo(T[] oldArr, T item)
 {
@@ -36,6 +37,25 @@ public void updateDirection(boolean inputValue)
   }
 }
 
+public void focus()
+{
+  float zoom = 1.0, focusX = width / 2.0, focusY = height / 2.0;
+  if (transitionTimer > 0)
+  {
+    float t, z;
+    if(transitionTimer > 30) { t = map(transitionTimer, 60, 30, 0, 1); }
+    else { t = map(transitionTimer, 30, 0, 1, 0); }
+    if(t < 0.5) { z = 4 * pow(t, 3);}
+    else { z = 1 - pow(-2 * t + 2, 3) / 2.0; }
+    zoom = 1.0 + 0.8 * z;
+    focusX = player.getPlayerX() + player.getPlayerSize() / 2;
+    focusY = player.getPlayerY() + player.getPlayerSize() / 2;
+  }
+  translate(focusX, focusY);
+  scale(zoom);
+  translate(-focusX, -focusY);
+}
+
 public void renderMask()
 {
   fill(227, 189, 85, 70);
@@ -44,19 +64,34 @@ public void renderMask()
 
 public void renderRoomTransition()
 {
+  float startAngle = 0, centerX = player.getPlayerX() + player.getPlayerSize() / 2,
+    centerY = player.getPlayerY() + player.getPlayerSize() / 2;
+    
+  if(transDir == TransDir.TUP) { startAngle = PI * 1.5; }
+  else if (transDir == TransDir.TRIGHT) { startAngle = 0; }
+  else if (transDir == TransDir.TDOWN) { startAngle = HALF_PI; }
+  else if (transDir == TransDir.TLEFT) { startAngle = PI; }
+
+  float progress = 0, eased = 0;
+  if(transitionTimer > 30) { progress = map(transitionTimer, 60, 30, 0, 1); }
+  else { progress = map(transitionTimer, 30, 0, 0, 1); }
+  if(progress < 0.5) { eased = 4 * pow(progress, 3); }
+  else { eased = 1 - pow(-2 * progress + 2, 3) / 2.0; }
+  
+  noStroke();
   fill(#061D43);
-  float outerR = dist(0, 0, (float)rows / 2 + 1, (float)columns / 2 + 1);
+  
   if(transitionTimer > 30)
   {
-    donutShape(width / 2, height / 2, PI * 1.5, PI * (1.5 + (60 - transitionTimer) / 15.0),
-      gridSize * 1.5, gridSize * outerR);
-    circle(width / 2, height / 2, gridSize * 3 * ((60 - transitionTimer) / 30) + 2);
+    donutShape(centerX, centerY, startAngle, startAngle + TWO_PI * eased,
+      gridSize * 1.5, width);
+    circle(centerX, centerY, gridSize * 3 * eased + 2);
   }
   else
   {
-    donutShape(width / 2, height / 2, PI  * (1.5 - transitionTimer / 15.0), PI * 1.5,
-      gridSize * 1.5, gridSize * outerR);
-    circle(width / 2, height / 2, gridSize * 3 * (transitionTimer / 30) + 2);
+    donutShape(centerX, centerY, startAngle + TWO_PI * eased, startAngle + TWO_PI,
+      gridSize * 1.5, width);
+    circle(centerX, centerY, gridSize * 3 * (1 - eased) + 2);
   }
 }
 
@@ -75,6 +110,23 @@ public void donutShape(float centerX, float centerY,
   {
     float curAngle = startAngle + i * dAngle;
     vertex(centerX + cos(curAngle) * outerR, centerY + sin(curAngle) * outerR); 
+  }
+  endShape(CLOSE);
+}
+
+public void starShape(float centerX, float centerY, float starSize)
+{
+  beginShape();
+  int steps = 12;
+  int[][] points = new int[][] {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
+  for(int i = 0; i < 4; i++)
+  {
+    for(int j = 0; j <= steps; j++)
+    {
+      float thisAngle = PI * (1 + i / 2.0 + 1.0 / steps / 2 * j);
+      vertex(centerX + starSize * (points[i][0] + cos(thisAngle)),
+        centerY + starSize * (points[i][1] + sin(thisAngle)));
+    }
   }
   endShape(CLOSE);
 }
@@ -124,10 +176,12 @@ public void updateMobsArray()
   MobData[] thisMobsData = mobData[currentRow][currentColumn];
   if(thisMobsData != null)
   {
-    if(roomDisData[currentRow][currentColumn] % 10 == 3)
+    int roomValue = roomDisData[currentRow][currentColumn];
+    if(roomValue % 10 == 3)
     {
       legMob = new Mob(thisMobsData[0]);
       boss = new Boss();
+      cutScene.setCutSceneType(CutSceneType.BOSS_INTRO);
       return;
     }
     for(MobData thisMobData: thisMobsData)
@@ -183,6 +237,7 @@ public void bossRoomCleared()
   mobData[currentRow][currentColumn] = null;
   player.addPlayerHealth(50);
   bossKilled += 1;
+  cutScene.setCutSceneType(CutSceneType.FINAL_DOOR_DISPLAY);
   println("Boss clear: "+bossKilled);
 }
 
@@ -420,23 +475,7 @@ public void renderDoors()
   //special final room door
   if(currentRow == 2 && currentColumn == 2)
   {
-    if(hasTopRoom())
-    {
-      //green rect placeholder for open final door.
-      fill(#1CF700);
-      rect(gridSize * 5, 0, gridSize, gridSize);
-    }
-    else
-    {
-      //red rect placeholder for closed final door,
-      //should use bossKilled to do something like finalDoorImages[bossKilled] -> 4 in len.
-      noStroke();
-      fill(#F70000);
-      rect(gridSize * 5, 0, gridSize, gridSize);
-      fill(#F0A2A9);
-      textSize(35);
-      text(bossKilled, gridSize * 5.4, gridSize * 0.6);
-    }
+    image(tiles[bossKilled + 12], gridSize * 5, 0, gridSize, gridSize);
   }
 }
 

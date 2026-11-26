@@ -15,6 +15,7 @@ Player player;
 Weapon weapon;
 Mob legMob = null;
 Boss boss = null;
+CutScene cutScene;
 boolean up = false, down = false, left = false,
   right = false, isShooting = false, isPaused = false;
 
@@ -24,7 +25,7 @@ ArrayList<Bullet> bulletArr = new ArrayList<Bullet>(),
   splitParentArr = new ArrayList<Bullet> ();
 
 PImage backgroundImage, playerImage, bossHealthBarFrame;
-PImage[] tiles = new PImage[12], bulletImages = new PImage[6],
+PImage[] tiles = new PImage[16], bulletImages = new PImage[6],
   mobImages = new PImage[18], weaponImages = new PImage[4], wordCards = new PImage[3];
 
 void setup()
@@ -51,6 +52,7 @@ void setup()
 
   player = new Player();
   weapon = new Weapon();
+  cutScene = new CutScene();
   //mobData[3][2] = appendTo(mobData[3][2], new MobData(2, 2, 100));
   //obsData[2][1] = appendTo(obsData[2][1], new ObstacleData(8, 5, 0));
   //saver.saveIntoData(mapData);
@@ -58,6 +60,9 @@ void setup()
 
 void draw()
 {
+  pushMatrix();
+  focus();
+  
   renderBackground();
   renderDoors();
   renderObstacles();
@@ -82,13 +87,21 @@ void draw()
   renderMobs();
   player.renderPlayer();
   weapon.renderWeapon();
+  
+  popMatrix();
+  
   renderBossHealthBar();
+  if(isPaused && cutScene.cutSceneType == null) { renderMask(); }
   if(transitionTimer > 0)
   {
     updateTransition();
     renderRoomTransition();
   }
-  if(isPaused) { renderMask(); }
+  else
+  {
+    cutScene.renderCutScene();
+    cutScene.updateCutSceneTimer();
+  }
   //tmpDisplayRoomInformation();
 }
 

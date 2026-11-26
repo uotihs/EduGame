@@ -78,23 +78,17 @@ public class Bullet
       }
     }
     
-    boolean hitInvincibleMob = false;
     for(Mob mob: checkList)
     {
       if(isOnTrajectory(bulletX + bulletSize / 2, bulletY + bulletSize / 2,
         mob.getMobX() + gridSize / 2, mob.getMobY() + gridSize / 2))
       {
-        if(mob.getHitTimer() == 0)
-        {
           mob.addMobHealth(bulletDamage * -1);
           mob.gotHit();
           hasHit = HitResult.HIT_TARGET;
           break;
-        }
-        else { hitInvincibleMob = true; }
       }
     }
-    if(hitInvincibleMob) { hasHit = HitResult.HIT_TARGET; }
   }
   
   private void damagePlayer()
