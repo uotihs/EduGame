@@ -2,14 +2,13 @@ public class Weapon
 {
   private float weaponX = 0, weaponY = 0, weaponSize = 0;
   private float angle = 0;
-  private float handOffsetY = 0, holdDistance = 0;
+  private float holdDistance = 0;
   private int weaponLevel = 0;
   private final int maxWeaponLevel = 3;
   
   public Weapon()
   {
     this.weaponSize = gridSize * 0.75;
-    this.handOffsetY = gridSize * 0.08;
     this.holdDistance = gridSize * 0.5;
     updateWeapon();
   }

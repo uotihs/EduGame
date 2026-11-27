@@ -83,10 +83,10 @@ public class Bullet
       if(isOnTrajectory(bulletX + bulletSize / 2, bulletY + bulletSize / 2,
         mob.getMobX() + gridSize / 2, mob.getMobY() + gridSize / 2))
       {
-        mob.addMobHealth(bulletDamage * -1);
-        mob.gotHit();
-        hasHit = HitResult.HIT_TARGET;
-        break;
+          mob.addMobHealth(bulletDamage * -1);
+          mob.gotHit();
+          hasHit = HitResult.HIT_TARGET;
+          break;
       }
     }
   }

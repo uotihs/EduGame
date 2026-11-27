@@ -422,16 +422,14 @@ public class Mob
   public float getMobX() { return mobX; }
   public float getMobY() { return mobY; }
   public int getMobHealth() { return mobHealth; }
+  public int getInitMobHealth() { return initMobHealth; }
   public int getPreRow() { return preRow; }
   public int getPreColumn() { return preColumn; }
   public int getHitTimer() { return hitTimer; }
   
   public void addMobHealth(int inputValue)
   {
-    if(hitTimer == 0)
-    {
-      this.mobHealth = max(mobHealth + inputValue, 0);
-    }
+    this.mobHealth = max(mobHealth + inputValue, 0);
   }
   public void addAttackCooldown(int inputValue)
   { 
