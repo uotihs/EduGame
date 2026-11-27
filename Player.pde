@@ -44,13 +44,23 @@ public class Player
     int nextRow = (int)(nextY / gridSize),
       leftColumn = (int)(playerX / gridSize),
       rightColumn = (int)((playerX + playerSize - 1) / gridSize);
-    if(!isObstacle(nextRow, leftColumn) &&
-      !isObstacle(nextRow, rightColumn))
+    boolean leftBlocked = isObstacle(nextRow, leftColumn),
+      rightBlocked = isObstacle(nextRow, rightColumn);
+    if(!leftBlocked && !rightBlocked)
     {
       playerY = nextY;
       checkManhaDist();
     }
-    else { playerY = nextRow * gridSize + playerSize; }
+    else
+    {
+      playerY = nextRow * gridSize + playerSize;
+      float tolerance = speed / 2 + 1;
+      if(abs(playerX - leftColumn * gridSize) <= tolerance
+        || abs(playerX + playerSize - rightColumn * gridSize) <= tolerance)
+      {
+        playerX = leftColumn * gridSize;
+      }
+    }
   }
   public void moveDown()
   {
@@ -71,7 +81,16 @@ public class Player
       playerY = nextY;
       checkManhaDist();
     }
-    else { playerY = (nextRow - 1) * gridSize; }
+    else
+    {
+      playerY = (nextRow - 1) * gridSize;
+      float tolerance = speed / 2 + 1;
+      if(abs(playerX - leftColumn * gridSize) <= tolerance
+        || abs(playerX + playerSize - rightColumn * gridSize) <= tolerance)
+      {
+        playerX = leftColumn * gridSize;
+      } 
+    }
   }
   public void moveLeft()
   {
@@ -150,7 +169,7 @@ public class Player
       if(playerAmmos > 0)
       {
         bulletArr.add(
-          new Bullet(playerX + playerSize / 2, playerY + playerSize / 2, 
+          new Bullet(playerX + playerSize / 2, playerY + playerSize / 2,
           mouseX - 15, mouseY - 15, 10, 0, TargetType.MOBS));
         playerAmmos -= 1;
         if(playerAmmos <= 0) { isReloading = true; }

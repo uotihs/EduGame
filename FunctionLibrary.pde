@@ -228,6 +228,7 @@ public void clearDeadMobs()
 public void roomCleared()
 {
   mobData[currentRow][currentColumn] = null;
+  bulletArr.clear();
   player.addPlayerHealth(20);
   println("Normal clear");
 }
@@ -235,6 +236,7 @@ public void roomCleared()
 public void bossRoomCleared()
 {
   mobData[currentRow][currentColumn] = null;
+  bulletArr.clear();
   player.addPlayerHealth(50);
   bossKilled += 1;
   cutScene.setCutSceneType(CutSceneType.FINAL_DOOR_DISPLAY);
