@@ -93,6 +93,31 @@ public class Button{
         
         
       }
+      public void printButton(int strokeW ,int sr,int sg,int sb,int br,int bg,int bb,int textS,int tr,int tg,int tb)
+      {
+
+        strokeWeight(strokeW);
+        stroke(sr,sg,sb);
+        fill(br,bg,bb);
+        if(onit && br>10 && bg>10 && bb>10) fill(br-10,bg-10,bb-10);
+        else if(onit) fill(#D8D8D8);
+
+        if(pressed&& br>20 && bg>20 && bb>20)fill(br-20,bg-20,bb-20);
+        else if(pressed) fill(#5D5C5C);
+        
+        rectMode(CENTER);
+        rect(this.centerx,this.centery,this.width1,this.height1);
+        
+        if(word!=null)
+        {
+          textSize(textS);
+          textAlign(CENTER,CENTER);
+          fill(tr,tg,tb);
+          text(word,centerx,centery);
+        }
+        
+        
+      }
       public boolean checkmouse()
       {
         if(mouseX >= this.centerx - this.width1/2 && mouseX <= this.centerx + this.width1/2 && mouseY >= this.centery - this.height1/2 && mouseY <= this.centery + this.height1/2 )
