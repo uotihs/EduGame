@@ -28,14 +28,24 @@ PImage backgroundImage, playerImage, bossHealthBarFrame;
 PImage[] tiles = new PImage[16], bulletImages = new PImage[6],
   mobImages = new PImage[18], weaponImages = new PImage[4], wordCards = new PImage[3];
 
+// start Panel checking
+StartPanel startPanel;
+
 void setup()
 {
   size(935, 765);
   initializeGame();
+  startPanel = new StartPanel(width,height);
 }
 
 void draw()
 {
+
+  if(startPanel.nowPage != 1)
+  {
+    startPanel.draw();
+    return;
+  }
   background(#030303);
   if(gameRunning)
   {
