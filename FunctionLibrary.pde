@@ -23,6 +23,38 @@ public static <T> T[] appendTo(T[] oldArr, T item)
   return newArr;
 }
 
+public void initializeGame()
+{
+  saver = new SaveManager();
+  initializeImages();
+  gridSize = width / 11;
+  player = new Player();
+  weapon = new Weapon();
+  cutScene = new CutScene();
+}
+
+public void startNewGame()
+{
+  mapData = saver.loadFromData();
+  roomDisData = mapData.roomDistData;
+  mobData = mapData.mobData;
+  obsData = mapData.obsData;
+  tmpPrintRoomDisData();
+  
+  currentRow = 2;
+  currentColumn = 2;
+  bossKilled = 0;
+  transitionTimer = 0;
+  legMob = null;
+  boss = null;
+  isPaused = false;
+  updateAllArrays();
+  
+  player = new Player();
+  weapon = new Weapon();
+  cutScene = new CutScene();
+}
+
 public void updateDirection(boolean inputValue)
 {
   if((keyCode == 87) || (keyCode == 38)) { up = inputValue; }
@@ -34,6 +66,11 @@ public void updateDirection(boolean inputValue)
   {
     if(isPaused) { isPaused = false; }
     else { isPaused = true; } 
+  }
+  if(keyCode == 80 && inputValue)
+  {
+    startNewGame();
+    gameRunning = true;
   }
 }
 
@@ -134,6 +171,7 @@ public void starShape(float centerX, float centerY, float starSize)
 public void gameOver()
 {
   isPaused = true;
+  gameRunning = false;
   // unfinished yet
 }
 
