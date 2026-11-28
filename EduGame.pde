@@ -28,6 +28,13 @@ PImage backgroundImage, playerImage, bossHealthBarFrame;
 PImage[] tiles = new PImage[16], bulletImages = new PImage[6],
   mobImages = new PImage[18], weaponImages = new PImage[4], wordCards = new PImage[3];
 
+
+
+// start Panel checking
+StartPanel startPanel;
+
+
+
 void setup()
 {
   saver = new SaveManager();
@@ -56,10 +63,23 @@ void setup()
   //mobData[3][2] = appendTo(mobData[3][2], new MobData(2, 2, 100));
   //obsData[2][1] = appendTo(obsData[2][1], new ObstacleData(8, 5, 0));
   //saver.saveIntoData(mapData);
+
+
+  // start Panel checking
+  startPanel = new StartPanel(width,height);
+
+
 }
 
 void draw()
 {
+  if(startPanel.nowPage != 1)
+  {
+    startPanel.draw();
+    return;
+  }
+
+
   pushMatrix();
   focus();
   

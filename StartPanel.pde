@@ -32,7 +32,8 @@ class StartPanel
     {        
         
 
-
+        pushMatrix();
+        translate(0,0);
         
         if(nowPage == 0) // start panel
         {
@@ -61,7 +62,7 @@ class StartPanel
         }
         else if(nowPage == 2) // credit
         {
-            
+            noStroke();
             fill(105,192,97);
             rectMode(CENTER);
             rect(width/2,height/2,width,height);
@@ -73,8 +74,8 @@ class StartPanel
             textSize(50);
             text("credit\n 1. 吳文禾\n 2. 黃上銘\n 3. 薛宇峻\n 4. 郭峻愷\n 5. 林宥廷\n6. 黃暐宸",wid/5,hei/3+100);
         }
-
-
+        rectMode(CORNER);
+        popMatrix();
 
 
 
