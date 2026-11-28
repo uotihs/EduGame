@@ -1,14 +1,14 @@
 public class Bullet
 {
-  private float bulletX=0, bulletY=0;
-  private float stepX=0, stepY=0;
-  private float speed=15, bulletSize=20;
-  private int bulletDamage=0;
+  private float bulletX = 0, bulletY = 0;
+  private float stepX = 0, stepY = 0, stepAngle = 0;
+  private float speed = 15, bulletSize = 30;
+  private int bulletDamage = 0, bulletType = 0, shiningStage = 0;
   private TargetType targetType;
-  private boolean hasHit=false;
+  private HitResult hasHit = HitResult.NOT_HIT;
 
   public Bullet(float spawnX, float spawnY, float targetX, float targetY, 
-    int inputDamage, TargetType inputTargetType)
+    int inputDamage, int inputBulletType, TargetType inputTargetType)
   {
     this.bulletX = spawnX;
     this.bulletY = spawnY;
@@ -17,6 +17,8 @@ public class Bullet
     float d = dist(spawnX, spawnY, targetX, targetY);
     this.stepX = speed * ((targetX - spawnX) / d);
     this.stepY = speed * ((targetY - spawnY) / d);
+    this.stepAngle = atan2(stepY, stepX);
+    this.bulletType = inputBulletType;
     this.targetType = inputTargetType;
   }
 
@@ -25,7 +27,7 @@ public class Bullet
     if(bulletX  + stepX < gridSize || bulletX + stepX > width - gridSize
       || bulletY + stepY < gridSize || bulletY + stepY > height - gridSize)
     {
-      hasHit = true;
+      hasHit = HitResult.HIT_OBS;
       return;
     }
     obsDetection();
@@ -36,7 +38,7 @@ public class Bullet
   
   private void damageTargets()
   {
-    if((stepX == 0 && stepY == 0) || hasHit == true) { return; }
+    if((stepX == 0 && stepY == 0) || hasHitObject()) { return; }
     if(targetType == TargetType.MOBS) { damageMobs(); }
     else { damagePlayer(); }
   }
@@ -47,6 +49,7 @@ public class Bullet
       curColumn = max((int)(bulletX / gridSize) - 1, 0);
       
     ArrayList<Mob> checkList = new ArrayList<Mob>();
+    if(legMob != null) { checkList.add(legMob); }
     checkList.addAll(mobGridArr[curRow * columns + curColumn]);
     if(stepX != 0)
     {
@@ -77,38 +80,40 @@ public class Bullet
     
     for(Mob mob: checkList)
     {
-      if(isOnTrajectory(bulletX, bulletY,
+      if(isOnTrajectory(bulletX + bulletSize / 2, bulletY + bulletSize / 2,
         mob.getMobX() + gridSize / 2, mob.getMobY() + gridSize / 2))
       {
-        mob.addMobHealth(bulletDamage * -1);
-        hasHit = true;
-        break;
+          mob.addMobHealth(bulletDamage * -1);
+          mob.gotHit();
+          hasHit = HitResult.HIT_TARGET;
+          break;
       }
     }
   }
   
   private void damagePlayer()
   {
-    if(isOnTrajectory(bulletX, bulletY,
+    if(isOnTrajectory(bulletX + bulletSize / 2, bulletY + bulletSize / 2,
         player.getPlayerX() + gridSize / 2, player.getPlayerY() + gridSize / 2))
     {
       player.addPlayerHealth(bulletDamage * -1);
-      hasHit = true;
+      player.gotHit();
+      hasHit = HitResult.HIT_TARGET;
     }
   }
   
   private void obsDetection()
   {
-    int curRow = (int)(bulletY / gridSize),
-      curColumn = (int)(bulletX / gridSize);
-    if(isObstacle(curRow, curColumn)) { hasHit = true; }
+    int curRow = (int)((bulletY + bulletSize / 2) / gridSize),
+      curColumn = (int)((bulletX + bulletSize / 2) / gridSize);
+    if(isObstacle(curRow, curColumn)) { hasHit = HitResult.HIT_OBS; }
   }
   
   private boolean isOnTrajectory(float aX, float aY, float pX, float pY)
   {
     float apX = pX - aX, apY = pY - aY;
     float t = (stepX * apX + stepY * apY) / (stepX * stepX + stepY * stepY);
-    if(t > 1) { return false; }
+    if(t < 0 || t > 1) { return false; }
     float dX = apX - t * stepX, dY = apY - t * stepY;
     return (dX * dX + dY * dY) <= 
       (gridSize * 0.7071 + bulletSize / 2 ) * (gridSize * 0.7071 + bulletSize / 2);
@@ -116,11 +121,35 @@ public class Bullet
 
   public void renderBullet()
   {
-    if(hasHit) { return; }
+    if(hasHitObject()) { return; }
     fill(255, 230, 0); 
     noStroke();
-    ellipse(bulletX, bulletY, bulletSize, bulletSize);
+    pushMatrix();
+    translate(bulletX, bulletY);
+    rotate(stepAngle);
+    PImage thisImage;
+    if(shiningStage < 4) { thisImage = bulletImages[bulletType * 2]; }
+    else { thisImage = bulletImages[bulletType * 2 + 1]; }
+    image(thisImage, 0, 0, bulletSize, bulletSize);
+    blendMode(ADD);
+    image(thisImage, 0, 0, bulletSize, bulletSize);
+    blendMode(BLEND);
+    popMatrix();
   }
   
-  public boolean hasHitObject() { return hasHit; }
+  public float getBulletX() { return bulletX; }
+  public float getBulletY() { return bulletY; }
+  public TargetType getTargetType() { return targetType; }
+  public float getBulletAngle() { return atan2(stepY, stepX);}
+  public HitResult getHasHit() { return hasHit; }
+  public boolean hasHitObject()
+  {
+    return hasHit == HitResult.HIT_OBS || hasHit == HitResult.HIT_TARGET;
+  }
+  
+  public void updateShiningStage()
+  {
+    shiningStage += 1;
+    if(shiningStage >= 8) shiningStage = 0;
+  }
 }

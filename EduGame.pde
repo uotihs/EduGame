@@ -10,19 +10,23 @@ Random rand = new Random();
 
 float gridSize, transitionTimer = 0;
 TransDir transDir;
-int currentRow = 2, currentColumn = 2;
+int currentRow = 2, currentColumn = 2, bossKilled = 0;
 Player player;
 Weapon weapon;
+Mob legMob = null;
+Boss boss = null;
+CutScene cutScene;
 boolean up = false, down = false, left = false,
   right = false, isShooting = false, isPaused = false;
-  
+
 ArrayList<Mob> mobArr;
 ArrayList<Mob>[] mobGridArr;
-ArrayList<Bullet> bulletArr = new ArrayList<Bullet>();
+ArrayList<Bullet> bulletArr = new ArrayList<Bullet>(),
+  splitParentArr = new ArrayList<Bullet> ();
 
-PImage backgroundImage;
-PImage[] tiles = new PImage[11];
-PImage[] weaponImages = new PImage[4];
+PImage backgroundImage, playerImage, bossHealthBarFrame;
+PImage[] tiles = new PImage[16], bulletImages = new PImage[6],
+  mobImages = new PImage[18], weaponImages = new PImage[4], wordCards = new PImage[3];
 
 void setup()
 {
@@ -36,22 +40,29 @@ void setup()
   obsData = mapData.obsData;
   saver.saveIntoData(mapData);
   
+  tmpPrintRoomDisData();
+  
   updateAllArrays();
 
   initializeImages();
   
-  size(880, 720);
+  size(935, 765);
+  //880, 720
   gridSize = width / 11;
 
   player = new Player();
   weapon = new Weapon();
-  //mobData[2][3] = appendTo(mobData[2][3], new MobData(4, 8));
+  cutScene = new CutScene();
+  //mobData[3][2] = appendTo(mobData[3][2], new MobData(2, 2, 100));
   //obsData[2][1] = appendTo(obsData[2][1], new ObstacleData(8, 5, 0));
   //saver.saveIntoData(mapData);
 }
 
 void draw()
 {
+  pushMatrix();
+  focus();
+  
   renderBackground();
   renderDoors();
   renderObstacles();
@@ -62,6 +73,7 @@ void draw()
     player.move();
     player.shoot();
     player.updateReloadTimer();
+    player.updateHitTimer();
     weapon.updateWeapon();
   
     mobsMove();
@@ -69,17 +81,27 @@ void draw()
   
     bulletsMove();
     clearHitBullets();
+    addSplitBullets();
   }
   renderBullets();
   renderMobs();
   player.renderPlayer();
   weapon.renderWeapon();
+  
+  popMatrix();
+  
+  renderBossHealthBar();
+  if(isPaused && cutScene.cutSceneType == null) { renderMask(); }
   if(transitionTimer > 0)
   {
     updateTransition();
     renderRoomTransition();
   }
-  if(isPaused) { renderMask(); }
+  else
+  {
+    cutScene.renderCutScene();
+    cutScene.updateCutSceneTimer();
+  }
   //tmpDisplayRoomInformation();
 }
 

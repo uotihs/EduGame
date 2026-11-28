@@ -6,7 +6,7 @@ public class Player
   private int playerHealth = 0;
   private final int maxPlayerHealth = 100;
   private int preRow = 0, preColumn = 0, distLimit = 3;
-  private int playerAmmos = 0, reloadTimer = 0;
+  private int playerAmmos = 0, reloadTimer = 0, hitTimer = 0;
   private boolean isReloading = false;
   private final int maxAmmos = 6, reloadDuration = 35;
   // we can consider doing acceleration to get smoother movement?
@@ -34,7 +34,7 @@ public class Player
   public void moveUp()
   { 
     if(isTouchingPoint(width / 2, gridSize * 1.5) &&
-      hasTopRoom() && mobArr.isEmpty())
+      hasTopRoom() && mobArr.isEmpty() && legMob == null)
     { 
       startRoomTransition(TransDir.TUP);
       updateMobsPath();
@@ -44,18 +44,28 @@ public class Player
     int nextRow = (int)(nextY / gridSize),
       leftColumn = (int)(playerX / gridSize),
       rightColumn = (int)((playerX + playerSize - 1) / gridSize);
-    if(!isObstacle(nextRow, leftColumn) &&
-      !isObstacle(nextRow, rightColumn))
+    boolean leftBlocked = isObstacle(nextRow, leftColumn),
+      rightBlocked = isObstacle(nextRow, rightColumn);
+    if(!leftBlocked && !rightBlocked)
     {
       playerY = nextY;
       checkManhaDist();
     }
-    else { playerY = nextRow * gridSize + playerSize; }
+    else
+    {
+      playerY = nextRow * gridSize + playerSize;
+      float tolerance = speed / 2 + 1;
+      if(abs(playerX - leftColumn * gridSize) <= tolerance
+        || abs(playerX + playerSize - rightColumn * gridSize) <= tolerance)
+      {
+        playerX = leftColumn * gridSize;
+      }
+    }
   }
   public void moveDown()
   {
     if(isTouchingPoint(width / 2, height - gridSize * 1.5) &&
-      hasBottomRoom() && mobArr.isEmpty())
+      hasBottomRoom() && mobArr.isEmpty() && legMob == null)
     { 
       startRoomTransition(TransDir.TDOWN);
       updateMobsPath();
@@ -71,12 +81,21 @@ public class Player
       playerY = nextY;
       checkManhaDist();
     }
-    else { playerY = (nextRow - 1) * gridSize; }
+    else
+    {
+      playerY = (nextRow - 1) * gridSize;
+      float tolerance = speed / 2 + 1;
+      if(abs(playerX - leftColumn * gridSize) <= tolerance
+        || abs(playerX + playerSize - rightColumn * gridSize) <= tolerance)
+      {
+        playerX = leftColumn * gridSize;
+      } 
+    }
   }
   public void moveLeft()
   {
     if(isTouchingPoint(gridSize * 1.5, height / 2) &&
-      hasLeftRoom() && mobArr.isEmpty())
+      hasLeftRoom() && mobArr.isEmpty() && legMob == null)
     { 
       startRoomTransition(TransDir.TLEFT);
       updateMobsPath();
@@ -97,7 +116,7 @@ public class Player
   public void moveRight()
   {
     if(isTouchingPoint(width - gridSize * 1.5, height / 2) &&
-      hasRightRoom() && mobArr.isEmpty())
+      hasRightRoom() && mobArr.isEmpty() && legMob == null)
     { 
       startRoomTransition(TransDir.TRIGHT);
       updateMobsPath();
@@ -150,8 +169,8 @@ public class Player
       if(playerAmmos > 0)
       {
         bulletArr.add(
-          new Bullet(playerX + playerSize / 2, playerY + playerSize / 2, 
-          mouseX, mouseY, 10, TargetType.MOBS));
+          new Bullet(playerX + playerSize / 2, playerY + playerSize / 2,
+          mouseX - 15, mouseY - 15, 10, 0, TargetType.MOBS));
         playerAmmos -= 1;
         if(playerAmmos <= 0) { isReloading = true; }
       }
@@ -176,11 +195,17 @@ public class Player
   
   public void renderPlayer()
   {
-    // should do image(charcterTiles[i], playerX, playerY, playerSize, playerSize); here.
-    // using rect() as tmp rendering object. 
     noStroke();
-    fill(#F72A2A);
-    rect(playerX, playerY, playerSize, playerSize);
+    image(playerImage, playerX, playerY, playerSize, playerSize);
+    if(hitTimer > 0)
+    {
+      blendMode(SUBTRACT);
+      if(hitTimer > 6) { tint(#0B8AA2); }
+      else { tint(#101F64); }
+      image(playerImage, playerX, playerY, playerSize, playerSize);
+      noTint();
+      blendMode(BLEND);
+    }
     displayHealthPointBar();
     displayAmmosBar();
   }
@@ -225,6 +250,11 @@ public class Player
   
   public void setPlayerX(float inputValue) { this.playerX = inputValue; }
   public void setPlayerY(float inputValue) { this.playerY = inputValue; }
+  public void gotHit()
+  {
+    if(hitTimer == 0) { hitTimer = 10; }
+  }
+  public void updateHitTimer() { hitTimer = max(hitTimer - 1, 0); }
   public void reload()
   {
     if(playerAmmos != maxAmmos)
@@ -234,6 +264,9 @@ public class Player
   }
   public void addPlayerHealth(int inputValue)
   {
-    this.playerHealth = min(max(playerHealth + inputValue, 0), maxPlayerHealth);
+    if(hitTimer == 0)
+    {
+      this.playerHealth = min(max(playerHealth + inputValue, 0), maxPlayerHealth);
+    }
   }
 }
