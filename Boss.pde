@@ -4,14 +4,16 @@ public class Boss
   private float bossX = 0, bossY = 0, bossSize = 0;
   private int bossType = 0, attackCooldown = 60, 
     stage = 0, stageTimer = 0;
-  private int narrowBurstLeft = 0, trackBulletsLeft = 0; 
+  private int narrowBurstLeft = 0, traceBulletsLeft = 0; 
   private float lockedTargetAngle = 0;
+  private boolean isCharging = false;
   
   public Boss()
   {
     teleportToLegMob();
     this.bossSize = gridSize;
     this.bossType = roomDisData[currentRow][currentColumn] / 10 - 1;
+    if(bossType == 2) { legMob.setMobSpeed(0); }
   }
   
   public void attack()
@@ -35,10 +37,16 @@ public class Boss
     }
     if(stageTimer == 0)
     {
+      if(isCharging)
+      {
+        isCharging = false;
+        legMob.setMobSpeed(2);
+        narrowRangeAttack();
+      }
       if(narrowBurstLeft > 0) { fireNarrowWave(); }
-      if(trackBulletsLeft > 0) { fireTrackBullet(); }
-      if(narrowBurstLeft > 0 || trackBulletsLeft > 0) { stageTimer = 3; }
-      if(stage == 2 && narrowBurstLeft + trackBulletsLeft == 0)
+      if(traceBulletsLeft > 0) { fireTraceBullet(); }
+      if(narrowBurstLeft + traceBulletsLeft != 0) { stageTimer = 3; }
+      if(stage == 2 && narrowBurstLeft + traceBulletsLeft == 0)
       {
         stage = 0;
         stageTimer = 6;
@@ -48,25 +56,34 @@ public class Boss
   
   private void physicsBossAttack()
   {
-    chemistryBossAttack();
+    int randNum = rand.nextInt(10);
+    if(randNum < 2) { wideRangeAttack(); }
+    else if(randNum < 5) { narrowRangeAttack(); }
+    else if(randNum < 9) { traceBulletAttack(); }
+    else { healing(); }
   }
   
   private void mathBossAttack()
   {
-    chemistryBossAttack();
+    int randNum = rand.nextInt(10);
+    if(randNum < 7)
+    {
+      if(legMob.thisCanSeePlayer()) { chargeAttack(); }
+      else { bounceBulletAttack(); }
+    }
+    else { traceBulletAttack(); }
   }
   
   private void chemistryBossAttack()
   {
     int randNum = rand.nextInt(10);
-    if(randNum < 2) { wideRangeAttack(); }
-    else if(randNum < 5) { narrowRangeAttack(); }
-    else if(randNum < 7) { trackBulletAttack(); }
-    else
+    if(randNum < 4)
     {
       if(mobArr.size() == 0) { summonMobs(); }
-      else { bounceBulletAttack(); }
+      else { narrowRangeAttack(); }
     }
+    else if(randNum < 7) { wideRangeAttack(); }
+    else { bounceBulletAttack(); }
   }
   
   private void wideRangeAttack()
@@ -124,13 +141,13 @@ public class Boss
     }
   }
   
-  private void trackBulletAttack()
+  private void traceBulletAttack()
   {
-    trackBulletsLeft = 15;
-    fireTrackBullet();
+    traceBulletsLeft = 15;
+    fireTraceBullet();
   }
   
-  private void fireTrackBullet()
+  private void fireTraceBullet()
   {
     float thisAngle = atan2(player.getPlayerY() - bossY,
       player.getPlayerX() - bossX),
@@ -140,7 +157,7 @@ public class Boss
       centerBossX, centerBossY,
       centerBossX + cos(thisAngle), centerBossY + sin(thisAngle),
       10, 1, TargetType.PLAYER));
-    trackBulletsLeft -= 1;
+    traceBulletsLeft -= 1;
   }
   
   private void summonMobs()
@@ -162,6 +179,17 @@ public class Boss
         mobGridArr[mobRow * columns + mobColumn].add(newMob);
       }
     }
+  }
+  
+  private void chargeAttack()
+  {
+    isCharging = true;
+    legMob.setMobSpeed(10);
+  }
+  
+  private void healing()
+  {
+    legMob.addMobHealth(30); 
   }
   
   public void teleportToLegMob()

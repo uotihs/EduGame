@@ -426,7 +426,9 @@ public class Mob
   public int getPreRow() { return preRow; }
   public int getPreColumn() { return preColumn; }
   public int getHitTimer() { return hitTimer; }
+  public boolean thisCanSeePlayer() { return canSeePlayer(); }
   
+  public void setMobSpeed(int inputValue) { this.speed = inputValue; }
   public void addMobHealth(int inputValue)
   {
     this.mobHealth = max(mobHealth + inputValue, 0);

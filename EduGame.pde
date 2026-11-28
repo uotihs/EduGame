@@ -17,7 +17,7 @@ Mob legMob = null;
 Boss boss = null;
 CutScene cutScene;
 boolean up = false, down = false, left = false,
-  right = false, isShooting = false, isPaused = false;
+  right = false, isShooting = false, isPaused = false, gameRunning = false;
 
 ArrayList<Mob> mobArr;
 ArrayList<Mob>[] mobGridArr;
@@ -28,101 +28,77 @@ PImage backgroundImage, playerImage, bossHealthBarFrame;
 PImage[] tiles = new PImage[16], bulletImages = new PImage[6],
   mobImages = new PImage[18], weaponImages = new PImage[4], wordCards = new PImage[3];
 
-
-
 // start Panel checking
 StartPanel startPanel;
 
-
-
 void setup()
 {
-  saver = new SaveManager();
-  // below line will reset whole data, can only use once after refactor!!!
-  //saver.initializeData();
-  
-  mapData = saver.loadFromData();
-  roomDisData = mapData.roomDistData;
-  mobData = mapData.mobData;
-  obsData = mapData.obsData;
-  saver.saveIntoData(mapData);
-  
-  tmpPrintRoomDisData();
-  
-  updateAllArrays();
-
-  initializeImages();
-  
   size(935, 765);
-  //880, 720
-  gridSize = width / 11;
-
-  player = new Player();
-  weapon = new Weapon();
-  cutScene = new CutScene();
-  //mobData[3][2] = appendTo(mobData[3][2], new MobData(2, 2, 100));
-  //obsData[2][1] = appendTo(obsData[2][1], new ObstacleData(8, 5, 0));
-  //saver.saveIntoData(mapData);
-
-
-  // start Panel checking
+  initializeGame();
   startPanel = new StartPanel(width,height);
-
-
 }
 
 void draw()
 {
+
   if(startPanel.nowPage != 1)
   {
     startPanel.draw();
     return;
   }
-
-
-  pushMatrix();
-  focus();
-  
-  renderBackground();
-  renderDoors();
-  renderObstacles();
-  
-  if(!isPaused && transitionTimer <= 0)
+  background(#030303);
+  if(gameRunning)
   {
-    if(player.isDead()) { gameOver(); }
-    player.move();
-    player.shoot();
-    player.updateReloadTimer();
-    player.updateHitTimer();
-    weapon.updateWeapon();
+    pushMatrix();
+    focus();
   
-    mobsMove();
-    clearDeadMobs();
+    renderBackground();
+    renderDoors();
+    renderObstacles();
   
-    bulletsMove();
-    clearHitBullets();
-    addSplitBullets();
-  }
-  renderBullets();
-  renderMobs();
-  player.renderPlayer();
-  weapon.renderWeapon();
+    if(!isPaused && transitionTimer <= 0)
+    {
+      if(player.isDead()) { gameOver(); }
+      player.move();
+      player.shoot();
+      player.updateReloadTimer();
+      player.updateHitTimer();
+      weapon.updateWeapon();
   
-  popMatrix();
+      mobsMove();
+      clearDeadMobs();
   
-  renderBossHealthBar();
-  if(isPaused && cutScene.cutSceneType == null) { renderMask(); }
-  if(transitionTimer > 0)
-  {
-    updateTransition();
-    renderRoomTransition();
+      bulletsMove();
+      clearHitBullets();
+      addSplitBullets();
+    }
+    renderBullets();
+    renderMobs();
+    player.renderPlayer();
+    weapon.renderWeapon();
+  
+    popMatrix();
+  
+    renderBossHealthBar();
+    if(isPaused && cutScene.cutSceneType == null) { renderMask(); }
+    if(transitionTimer > 0)
+    {
+      updateTransition();
+      renderRoomTransition();
+    }
+    else
+    {
+      cutScene.renderCutScene();
+      cutScene.updateCutSceneTimer();
+    }
+    //tmpDisplayRoomInformation();
   }
   else
   {
-    cutScene.renderCutScene();
-    cutScene.updateCutSceneTimer();
+    fill(255);
+    textSize(50);
+    text("Press P to start game.", gridSize * 3, gridSize * 4.5); 
   }
-  //tmpDisplayRoomInformation();
 }
 
 void keyPressed() { updateDirection(true); }
